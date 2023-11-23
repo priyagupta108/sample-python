@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: priyagupta108/setup-python@test
         with:
-          python-version: 3.10
+          python-version: '3.x'
 
       - name: Install dependencies
         run: pip install -r requirements.txt
@@ -44,7 +44,7 @@ jobs:
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v2
         with:
-          python-version: 3.10
+          python-version: '3.x'
           build-script-path: ./setup.py
     
           token: ${{ secrets.PYPI_API_TOKEN }}
