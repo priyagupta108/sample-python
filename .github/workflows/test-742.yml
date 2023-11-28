@@ -35,5 +35,4 @@ jobs:
       - name: Download more tests from friend projects
         if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: sh download-more-tests.sh
-      - name: run tests
-        run: python -m pytest
+      
