@@ -25,7 +25,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
           cache: pip
-          cache-dependency-path: .github/workflows/tests.yml
+          cache-dependency-path: .github/workflows/test-742.yml
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
       - name: Install pytest
