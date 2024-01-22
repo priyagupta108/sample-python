@@ -16,10 +16,10 @@ jobs:
 
     - name: Check directory
       run: |
-        if [ -d "Users/priyagupta108/actions-runner/_work/hostedtoolcache" ]; then
+        if [ -d "Users/priyagupta/actions-runner/_work/hostedtoolcache" ]; then
           echo "Python hostedtoolcache folder exists."
         else
           echo "Creating Python hostedtoolcache folder..."
-          mkdir -p "Users/priyagupta108/actions-runner/_work/hostedtoolcache"
+          mkdir -p "Users/priyagupta/actions-runner/_work/hostedtoolcache"
           echo "Python hostedtoolcache folder created."
         fi
