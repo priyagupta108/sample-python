@@ -1,0 +1,25 @@
+name: Checkout and Setup Workflow
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: [self-hosted, macos]
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.9
+
+    - name: Check directory
+      run: |
+        if [ -d "Users/priyagupta108/actions-runner/_work/hostedtoolcache" ]; then
+          echo "Python hostedtoolcache folder exists."
+        else
+          echo "Creating Python hostedtoolcache folder..."
+          mkdir -p "Users/priyagupta108/actions-runner/_work/hostedtoolcache"
+          echo "Python hostedtoolcache folder created."
+        fi
