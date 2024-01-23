@@ -1,7 +1,6 @@
 name: Checkout and Setup Workflow
 
 on: [push, pull_request]
-
 jobs:
   build:
     runs-on: [self-hosted, macos]
@@ -17,11 +16,17 @@ jobs:
     - name: Install Homebrew
       run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
+    - name: Check system libraries
+      run: ls -la /usr/local/opt/gettext/lib/
+
     - name: Install gettext
       run: brew install gettext
 
     - name: Force link gettext
-      run: brew link gettext --force
+      run: brew link --overwrite gettext --force
 
-    - name: Verify installation
+    - name: Check system libraries again
+      run: ls -la /usr/local/opt/gettext/lib/
+
+    - name: Upgrade pip 
       run: python3.9 -m ensurepip
