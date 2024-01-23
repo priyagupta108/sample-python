@@ -11,22 +11,22 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.9'
+        python-version: '3.11'
 
-    - name: Install Homebrew
-      run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # - name: Install Homebrew
+    #   run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-    - name: Check system libraries
-      run: ls -la /usr/local/opt/gettext/lib/
+    # - name: Check system libraries
+    #   run: ls -la /usr/local/opt/gettext/lib/
 
-    - name: Install gettext
-      run: brew install gettext
+    # - name: Install gettext
+    #   run: brew install gettext
 
-    - name: Force link gettext
-      run: brew link --overwrite gettext --force
+    # - name: Force link gettext
+    #   run: brew link --overwrite gettext --force
 
-    - name: Check system libraries again
-      run: ls -la /usr/local/opt/gettext/lib/
+    # - name: Check system libraries again
+    #   run: ls -la /usr/local/opt/gettext/lib/
 
-    - name: Upgrade pip 
-      run: python3.9 -m ensurepip
+    # - name: Upgrade pip 
+    #   run: python3.9 -m ensurepip
