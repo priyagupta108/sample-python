@@ -1,7 +1,6 @@
 name: Checkout and Setup Workflow
 
 on: [push, pull_request]
-
 jobs:
   build:
     runs-on: [self-hosted, macos]
