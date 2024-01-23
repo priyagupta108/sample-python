@@ -1,6 +1,7 @@
 name: Checkout and Setup Workflow
 
 on: [push, pull_request]
+
 jobs:
   build:
     runs-on: [self-hosted, macos]
@@ -13,5 +14,14 @@ jobs:
       with:
         python-version: '3.9'
 
-    - name: Run ensurepip
+    - name: Install Homebrew
+      run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    - name: Install gettext
+      run: brew install gettext
+
+    - name: Force link gettext
+      run: brew link gettext --force
+
+    - name: Verify installation
       run: python3.9 -m ensurepip
