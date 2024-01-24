@@ -11,8 +11,8 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11.6'
-        check-latest : false
+        python-version: '3.3.7'
+        
 
     # - name: Install Homebrew
     #   run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
