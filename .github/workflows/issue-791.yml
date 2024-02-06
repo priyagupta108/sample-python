@@ -3,7 +3,7 @@ name: Checkout and Setup Workflow
 on: [push, pull_request]
 jobs:
   build:
-    runs-on: [self-hosted, macos]
+    runs-on: self-hosted
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
@@ -12,23 +12,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.9'
-    - name: Uninstall pip
-      run: python -m pip uninstall pip -y
+    - name: python version
+      run: python --version
 
-    # - name: Install Homebrew
-    #   run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    # - name: Check system libraries
-    #   run: ls -la /usr/local/opt/gettext/lib/
-
-    # - name: Install gettext
-    #   run: brew install gettext
-
-    # - name: Force link gettext
-    #   run: brew link --overwrite gettext --force
-
-    # - name: Check system libraries again
-    #   run: ls -la /usr/local/opt/gettext/lib/
-
-    # - name: Upgrade pip 
-    #   run: python3.9 -m ensurepip
+   
