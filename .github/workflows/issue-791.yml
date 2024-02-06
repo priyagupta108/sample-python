@@ -12,7 +12,9 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.9'
-    - name: python version
-      run: python --version
-
+    - name: Check Python version
+      run: |
+        echo "Python path: $PYTHONPATH"
+        echo "/opt/hostedtoolcache/Python/3.9.18/x64/python --version"
+        echo "python --version"
    
