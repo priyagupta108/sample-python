@@ -1,9 +1,11 @@
-name: Checkout and Setup Workflow
+name: Checkout and Setup python
 
-on: [push, pull_request]
+on:
+ workflow_dispatch:
 jobs:
   build:
     runs-on: self-hosted
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
@@ -11,10 +13,10 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.9'
+        python-version: '3.11'
     - name: Check Python version
       run: |
-        echo "Python path: $PYTHONPATH"
-        echo "/opt/hostedtoolcache/Python/3.9.18/x64/python --version"
-        echo "python --version"
+       echo "Python path: $PYTHONPATH"
+       
+       python --version
    
