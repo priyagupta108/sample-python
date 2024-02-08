@@ -18,26 +18,49 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
+ test:
+  runs-on: macos-latest
+  steps:
+     - uses: actions/checkout@v2
+     - uses: actions/setup-python@v2
+       with:
+         python-version: 3.7
+     - run: |
+         echo $PATH
+         python --version
+         which python
+     - run: |
+         echo $PATH
+         python --version
+         which python
+       shell: bash {0}
+     - run: |
+         echo $PATH
+         python --version
+         which python
+         shell: bash -l {0}
 
-    runs-on: ubuntu-latest
+       
+   # deploy:
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.10"
+   #  runs-on: ubuntu-latest
 
-    - name: Modify PATH
-      run: echo "/opt/hostedtoolcache/Python/3.9.18/x64/bin" >> $GITHUB_PATH
+   #  steps:
+   #  - uses: actions/checkout@v3
+   #  - name: Set up Python
+   #    uses: actions/setup-python@v5
+   #    with:
+   #      python-version: "3.10"
+
+   #  - name: Modify PATH
+   #    run: echo "/opt/hostedtoolcache/Python/3.9.18/x64/bin" >> $GITHUB_PATH
 
 
-    - name: Check Python version
-      run: |
-       echo "Python path:  $PATH"
-       /opt/hostedtoolcache/Python/3.9.18/x64/python --version
-       python --version
+   #  - name: Check Python version
+   #    run: |
+   #     echo "Python path:  $PATH"
+   #     /opt/hostedtoolcache/Python/3.9.18/x64/python --version
+   #     python --version
 
       
      
