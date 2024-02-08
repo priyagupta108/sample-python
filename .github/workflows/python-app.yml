@@ -34,7 +34,10 @@ jobs:
 
 
     - name: Check Python version
-      run: python --version
+      run: |
+       echo "Python path: $PYTHONPATH"
+       /opt/hostedtoolcache/Python/3.9.18/x64/python --version
+       python --version
 
       
      
