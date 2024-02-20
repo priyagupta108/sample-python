@@ -13,3 +13,6 @@ jobs:
         with:
           python-version: 3.12
           cache: 'pip'
+
+      - name: Install dependencies
+        run:  pip install 
