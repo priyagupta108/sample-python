@@ -3,11 +3,9 @@ name: CI
 on:
   push:
     branches: [ issue-819 ]
-  
 
 jobs:
   build:
-
     runs-on: [self-hosted]
 
     steps:
@@ -17,6 +15,10 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12.0-alpha - 3.12.0'
-        
-    
+        python-version: '3.11.2'
+
+    - name: Check Python version with PowerShell
+      run: |
+        $pythonVersion = python --version
+        Write-Host "Python version is $pythonVersion"
+      shell: powershell
