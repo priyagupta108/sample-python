@@ -17,8 +17,4 @@ jobs:
       with:
         python-version: '3.11.2'
 
-    - name: Check Python version with PowerShell
-      run: |
-        $pythonVersion = python --version
-        Write-Host "Python version is $pythonVersion"
-      shell: powershell
+   
