@@ -15,23 +15,6 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11.2'
-
-
-        name: Download and Extract Python Zip
-
-  Extract:
-    runs-on: windows-latest
-
-    steps:
-    - name: Download and Extract Python Zip
-      run: |
-        $url = "https://github.com/actions/python-versions/releases/download/3.11.8-7809691605/python-3.11.8-win32-x64.zip"
-        $output = "python.zip"
-
-        Invoke-WebRequest -Uri $url -OutFile $output
-
-        Expand-Archive -Path $output -DestinationPath .\python
-      shell: powershell
+        python-version: '3.6.x - 3.11.x'
 
    
