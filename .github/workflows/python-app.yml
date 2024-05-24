@@ -13,7 +13,7 @@ jobs:
 
       - name: Add annotation
         run: |
-         echo "::error file=app.js,line=10,endLine=20,col=15,endColumn=30::Something went wrong"
+         echo "::error file=app.py,line=10,endLine=20,col=15,endColumn=30::Something went wrong"
 
 
       - name: Install dependencies
