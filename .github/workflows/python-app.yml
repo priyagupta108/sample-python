@@ -11,10 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.9.13
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.9.13
+      - name: Add annotation
+        run: |
+         echo "::error file=app.js,line=10,endLine=20,col=15,endColumn=30::Something went wrong"
+
 
       - name: Install dependencies
         run: |
