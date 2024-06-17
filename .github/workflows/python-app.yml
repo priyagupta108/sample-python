@@ -2,7 +2,7 @@ name: Reproduce Issue
 
 on:
   push:
-    branches: [ issue-874 ]
+    branches: [ main ]
 
 jobs:
   reproduce:
@@ -19,7 +19,6 @@ jobs:
         echo "print('OK')" > test/a.py
         mkdir test1
         echo "print('OK')" > test1/a.py
-    - name: Run OK
-      run: python -m test1.a
-    - name: Run Fail
-      run: python test/a.py
+    - name: Run script
+      working-directory: ./test
+      run: python -m a
