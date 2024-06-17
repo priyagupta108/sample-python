@@ -2,7 +2,7 @@ name: Reproduce Issue
 
 on:
   push:
-    branches: [ main ]
+    branches: [ issue-874 ]
 
 jobs:
   reproduce:
