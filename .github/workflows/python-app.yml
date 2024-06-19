@@ -21,4 +21,4 @@ jobs:
     - name: Run OK
       run: python -m test1.a
     - name: Run Fail
-      run: python -m test.a
+      run: python test.a
