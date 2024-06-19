@@ -16,8 +16,9 @@ jobs:
         echo "print('OK')" > test/a.py
         mkdir test1
         echo "print('OK')" > test1/a.py
+    - name: Extend PYTHONPATH
+      run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
     - name: Run OK
       run: python -m test1.a
     - name: Run Fail
-      run: |
-        python -c "from test import a"
+      run: python -m test.a
