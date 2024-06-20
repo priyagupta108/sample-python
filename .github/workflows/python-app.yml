@@ -14,11 +14,13 @@ jobs:
       run: |
         mkdir test
         echo "print('OK')" > test/a.py
+        touch test/__init__.py
         mkdir test1
         echo "print('OK')" > test1/a.py
-    - name: Extend PYTHONPATH
-      run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
     - name: Run OK
-      run: python -m test1.a
-    - name: Run Fail
-      run: python test.a
+      run: |
+        python -m test1.a
+    - name: Run with PYTHONPATH
+      run: |
+        export PYTHONPATH=$PYTHONPATH:$(pwd)
+        python -m test.a
