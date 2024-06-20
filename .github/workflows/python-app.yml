@@ -14,12 +14,14 @@ jobs:
       run: |
         mkdir test
         echo "print('OK')" > test/a.py
-        touch test/__init__.py
+        # touch test/__init__.py
         mkdir test1
         echo "print('OK')" > test1/a.py
     - name: Run OK
       run: |
         python -m test1.a
-    - name: Run with PYTHONPATH
+    - name: Run test.a
       run: |
-        python -m test.a
+        PYTHONPATH=$(pwd) python -m test.a
+
+        
