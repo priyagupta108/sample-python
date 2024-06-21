@@ -1,1 +1,1 @@
-# sample-python
+# pytest-exampl
