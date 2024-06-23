@@ -1,7 +1,7 @@
 name: Checkout and Setup python
 
 on:
- push
+ pull_request
 
 jobs:
   build:
