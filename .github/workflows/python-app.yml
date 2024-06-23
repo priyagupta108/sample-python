@@ -18,6 +18,8 @@ jobs:
         echo "print('OK')" > test1/a.py
     - name: Extend PYTHONPATH
       run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+    - name: Print sys.path
+      run: python -c "import sys; print(sys.path)"
     - name: Run OK
       run: python -m test1.a
     - name: Run Fail
