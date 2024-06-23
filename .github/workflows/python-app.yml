@@ -22,6 +22,6 @@ jobs:
         python -m test1.a
     - name: Run test.a
       run: |
-        PYTHONPATH=$(pwd) python -m test.a
+       python -m pkg.test.a
 
         
