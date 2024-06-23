@@ -16,7 +16,12 @@ jobs:
         echo "print('OK')" > test/a.py
         mkdir test1
         echo "print('OK')" > test1/a.py
-    
+    - name: Extend PYTHONPATH
+      run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+    - name: Print current working directory
+      run: pwd
+    - name: Print PYTHONPATH
+      run: echo $PYTHONPATH
     - name: Print sys.path
       run: python -c "import sys; print(sys.path)"
     - name: Run OK
