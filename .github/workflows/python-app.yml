@@ -3,7 +3,7 @@ name: Bug
 on: push
 jobs:
   reproduce:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
