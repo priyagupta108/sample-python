@@ -24,8 +24,8 @@ jobs:
   
        
     runs-on: ${{ matrix.platform }}
-    env:
-      SETUPTOOLS_USE_DISTUTILS: stdlib
+    # env:
+      # SETUPTOOLS_USE_DISTUTILS: stdlib
    
  
     steps:
@@ -37,4 +37,4 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-          allow-prereleases: true
+          # allow-prereleases: true
