@@ -8,15 +8,19 @@ jobs:
     strategy:
       matrix:
         python:
-         - "3.8"
-        
+        # - "3.8"
+         - "3.8.12"
+         - "3.8.13"
+         - "3.8.14"
+         - "3.8.15"
+           
         # - "3.12.3"
         # - "3.8.10"
         # - "3.12.0-alpha.6"
         platform:
-        - macos-latest
-        # - macos-13
-        # - macos-12
+        # - macos-latest
+        - macos-13
+        - macos-12
   
        
     runs-on: ${{ matrix.platform }}
