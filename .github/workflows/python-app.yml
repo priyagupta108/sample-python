@@ -31,10 +31,10 @@ jobs:
     steps:
       - name: Reproduce error
         run: python -c "import ensurepip; ensurepip.bootstrap()"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
       - name: Setup Python
-        id: python-install
-        uses: actions/setup-python@v5
+        # id: python-install
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
           # allow-prereleases: true
