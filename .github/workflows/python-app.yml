@@ -26,8 +26,11 @@ jobs:
     runs-on: ${{ matrix.platform }}
     env:
       SETUPTOOLS_USE_DISTUTILS: local
-    
+   
+ 
     steps:
+      - name: Reproduce error
+        run: python -c "import ensurepip; ensurepip.bootstrap()"
       - uses: actions/checkout@v4
       - name: Setup Python
         id: python-install
