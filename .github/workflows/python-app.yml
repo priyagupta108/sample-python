@@ -1,7 +1,7 @@
 name: tests setuptools
 
 on:
-  workflow_dispatch:
+  push:
 
 jobs:
   test:
