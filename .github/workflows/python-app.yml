@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         python:
-        - "3.8.10"
+        - "3.8"
         - "3.12"
         platform:
         - macos-latest
@@ -19,7 +19,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     continue-on-error: ${{ matrix.python == '3.13' }}
     env:
-      SETUPTOOLS_USE_DISTUTILS: stdlib
+      SETUPTOOLS_USE_DISTUTILS: local
     
     steps:
       - uses: actions/checkout@v4
