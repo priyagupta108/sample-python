@@ -28,6 +28,5 @@ jobs:
         id: python-install
         uses: actions/setup-python@v5
         with:
-          architecture: x64
           python-version: ${{ matrix.python }}
           allow-prereleases: true
