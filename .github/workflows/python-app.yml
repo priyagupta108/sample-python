@@ -35,9 +35,16 @@ jobs:
  
     steps:
       - uses: actions/checkout@v4
+      - name: Print setuptools version
+        run: |
+          python -c "import setuptools; print(setuptools.__version__)"
       - name: Setup Python
         id: python-install
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           allow-prereleases: true
+
+      - name: Print setuptools version
+        run: |
+          python -c "import setuptools; print(setuptools.__version__)"    
