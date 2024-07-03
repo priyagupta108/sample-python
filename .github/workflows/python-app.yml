@@ -14,14 +14,18 @@ jobs:
       with:
         python-version: '3.8.10'
 
-    - name: Set environment variable for setuptools
-      run: echo "SETUPTOOLS_USE_DISTUTILS=local" >> $GITHUB_ENV
+    # - name: Upgrade pip and setuptools
+    #   run: |
+    #     python -m pip install --upgrade pip setuptools
 
     - name: Install dependencies
+      env:
+        SETUPTOOLS_USE_DISTUTILS: local
       run: |
-        python -m pip install --upgrade pip
         pip install -r requirements.txt
 
     - name: Run tests
+      env:
+        SETUPTOOLS_USE_DISTUTILS: local
       run: |
         pytest
