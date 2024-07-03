@@ -1,50 +1,32 @@
-name: tests setuptools
+name: Example Workflow
 
 on:
   push:
 
 jobs:
   test:
-    strategy:
-      matrix:
-        python:
-        # - "3.8"
-         # - "3.9"
-         # - "3.8.12"
-         # - "3.8.13"
-         # - "3.8.14"
-         # - "3.8.15"
-        # - "3.8.17"
-        # - "3.12.3"
-        # - "3.8.10"
-        # - "3.12.1"
-        # - "3.12.0-alpha.6"
-         - "3.9.13"
-         
-        
-        platform:
-        - macos-latest
-        - macos-13
-        - macos-12
-  
-       
-    runs-on: ${{ matrix.platform }}
-    env:
-      SETUPTOOLS_USE_DISTUTILS: local
-   
- 
+    runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v4
       
       - name: Setup Python
-        id: python-install
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python }}
-          allow-prereleases: true
-      - name: Check distutils installation
+          python-version: "3.8.10"
+
+      - name: Upgrade pip and setuptools
         run: |
-          python -c "import distutils; print(distutils.__file__)"
-      - name: Print setuptools version
-        run: |
-          python -c "import setuptools; print(setuptools.__version__)"    
+          python -m pip install --upgrade pip setuptools
+
+      - name: Set Environment Variable for Specific Step
+        run: echo "SETUPTOOLS_USE_DISTUTILS=local" >> $GITHUB_ENV
+
+
+      - name: Check distutils Installation
+        run: python -c "import distutils; print(distutils.__file__)"
+
+      - name: Print Setuptools Version
+        run: python -c "import setuptools; print(setuptools.__version__)"
+
+     
