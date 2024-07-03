@@ -35,9 +35,7 @@ jobs:
  
     steps:
       - uses: actions/checkout@v4
-      - name: Check distutils installation
-        run: |
-          python -c "import distutils; print(distutils.__file__)"
+      
       - name: Setup Python
         id: python-install
         uses: actions/setup-python@v5
