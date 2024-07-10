@@ -32,8 +32,9 @@ jobs:
     - name: Print PATH after prepend
       run: echo $PATH
 
-    - name: Check executable from new path
+    - name: Create directory and executable
       run: |
+        mkdir -p /example/path
         touch /example/path/my-executable
         chmod +x /example/path/my-executable
         echo "echo 'Hello from new path'" > /example/path/my-executable
