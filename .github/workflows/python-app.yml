@@ -3,25 +3,29 @@ name: Reproduce Issue #851
 on:
   push:
     branches: [ "issue-851" ]
+ 
 jobs:
    test:
      runs-on: ubuntu-latest
 
      steps:
      - name: Checkout repository
-       uses: actions/checkout@v2
+       uses: actions/checkout@v4
 
      - name: Set up Python
-       uses: actions/setup-python@v4
+       uses: actions/setup-python@v5
        with:
-         python-version: '3.8'
+         python-version: '3.12'
 
      - name: Print PATH after setup-python
        run: echo $PATH
 
      - name: Append to PATH
-       run: echo "/example/path" >> $GITHUB_PATH
-
+       run: |
+         echo "/example/path" >> $GITHUB_PATH
+         echo "/another/example/path" >> $GITHUB_PATH
+         echo $PATH
+     
      - name: Print PATH after append
        run: echo $PATH
- 
+ ```
