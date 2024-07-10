@@ -3,25 +3,25 @@ name: Reproduce Issue #851
 on:
   push:
     branches: [ "issue-851" ]
-
 jobs:
-  test:
-    runs-on: ubuntu-latest
+   test:
+     runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v3
+     steps:
+     - name: Checkout repository
+       uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.9
+     - name: Set up Python
+       uses: actions/setup-python@v4
+       with:
+         python-version: '3.8'
 
-    - name: Create and activate virtual environment
-      run: |
-        python -m venv venv
-        source venv/bin/activate
-        echo "VIRTUAL_ENV: $VIRTUAL_ENV"
-        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+     - name: Print PATH after setup-python
+       run: echo $PATH
 
-    - name: Check environment variable
-      run: echo "${{ env.VIRTUAL_ENV }}"
+     - name: Append to PATH
+       run: echo "/example/path" >> $GITHUB_PATH
+
+     - name: Print PATH after append
+       run: echo $PATH
+ 
