@@ -4,28 +4,36 @@ on:
   push:
     branches: [ "issue-851" ]
  
+
+
 jobs:
-   test:
-     runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest
 
-     steps:
-     - name: Checkout repository
-       uses: actions/checkout@v4
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-     - name: Set up Python
-       uses: actions/setup-python@v5
-       with:
-         python-version: '3.12'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
 
-     - name: Print PATH after setup-python
-       run: echo $PATH
+    - name: Print PATH after setup-python
+      run: echo $PATH
 
-     - name: Append to PATH
-       run: |
-         echo "/example/path" >> $GITHUB_PATH
-         echo "/another/example/path" >> $GITHUB_PATH
-         echo $PATH
-     
-     - name: Print PATH after append
-       run: echo $PATH
+    - name: Prepend to PATH
+      run: |
+        echo "/example/path:/another/example/path:$PATH" > $GITHUB_ENV
+        echo $PATH
+
+    - name: Print PATH after prepend
+      run: echo $PATH
+
+    - name: Check executable from new path
+      run: |
+        touch /example/path/my-executable
+        chmod +x /example/path/my-executable
+        echo "echo 'Hello from new path'" > /example/path/my-executable
+        /example/path/my-executable
 
