@@ -13,7 +13,7 @@ jobs:
         with:
            python-version: '3.x'
 
-      - run: echo "$PATH"
+
 
       - name: Reorder PATH
         run: echo "PATH=/your/path/to/virtualenv/bin:$PATH" >> $GITHUB_ENV
