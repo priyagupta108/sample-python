@@ -28,7 +28,7 @@ jobs:
     - name: Prepend to PATH
       run: |
         echo "PATH=/example/path:/another/example/path:$PATH" >> $GITHUB_ENV
-        echo $PATH
+
 
     - name: Print PATH after prepend
       run: echo $PATH
