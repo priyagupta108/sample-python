@@ -5,18 +5,26 @@ on:
     branches: [ "issue-851" ]
  
 jobs:
-  test:
-    runs-on: ubuntu-latest
+   test:
+     runs-on: ubuntu-latest
 
-    steps:
-   
-      - uses: actions/setup-python@v4
-        with:
-           python-version: '3.x'
+     steps:
+     - name: Checkout repository
+       uses: actions/checkout@v4
 
+     - name: Set up Python
+       uses: actions/setup-python@v5
+       with:
+         python-version: '3.12'
 
-      - name: Reorder PATH
-        run: echo "PATH=/your/path/to/virtualenv/bin:$PATH" >> $GITHUB_PATH
+     - name: Print PATH after setup-python
+       run: echo $PATH
+
+     - name: Append to PATH
+       run: |
+         echo "/example/path" >> $GITHUB_PATH
+         echo "/another/example/path" >> $GITHUB_PATH
+         echo $PATH
      
-
-      - run: echo "$PATH"
+     - name: Print PATH after append
+       run: echo $PATH
