@@ -13,30 +13,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+           python-version: '3.x'
 
-    - name: Set up Python
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.8'
-        update-environment: false
+      - run: echo "$PATH"
 
-    - name: Print PATH after setup-python
-      run: echo $PATH
+      - name: Reorder PATH
+        run: echo "/your/path/to/virtualenv/bin:$PATH" >> $GITHUB_ENV
 
-    - name: Prepend to PATH
-      run: |
-        echo "PATH=/example/path:/another/example/path:$PATH" >> $GITHUB_ENV
-
-
-    - name: Print PATH after prepend
-      run: echo $PATH
-
-    - name: Create directory and executable
-      run: |
-        mkdir -p /example/path
-        touch /example/path/my-executable
-        chmod +x /example/path/my-executable
-        echo "echo 'Hello from new path'" > /example/path/my-executable
-        /example/path/my-executable
+      - run: echo "$PATH"
