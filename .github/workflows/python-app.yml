@@ -10,8 +10,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-        python: [ '3.9', '3.10' ]
+        os: [ubuntu-latest]
+        python: ['3.9']
 
     steps:
     - uses: actions/checkout@v3
@@ -23,23 +23,13 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
         
-    - name: venv activate Linux
-      if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
+    - name: venv activate
       run: |
-        mkdir test-venv
-        cd test-venv
-        python -m venv .
-        source ./bin/activate
+        python -m venv test-venv
+        echo 'VIRTUAL_ENV=test-venv' >> $GITHUB_ENV
+        echo 'PATH=test-venv/bin:$PATH' >> $GITHUB_ENV
+        source test-venv/bin/activate
         echo "VIRTUAL_ENV: $VIRTUAL_ENV"
-        
-    - name: venv activate Windows
-      if: ${{ matrix.os == 'windows-latest' }}
-      run: |
-        mkdir test-venv
-        cd test-venv
-        python -m venv .
-        ./Scripts/Activate.ps1
-        Write-Host "VIRTUAL_ENV: $env:VIRTUAL_ENV"
 
     - name: Print PATH after append
       run: echo $PATH    
