@@ -40,3 +40,6 @@ jobs:
         python -m venv .
         ./Scripts/Activate.ps1
         Write-Host "VIRTUAL_ENV: $env:VIRTUAL_ENV"
+
+    - name: Print PATH after append
+      run: echo $PATH    
