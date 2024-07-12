@@ -1,35 +1,49 @@
-name: Reproduce Issue #851
+name: Build executables
 
 on:
   push:
-    branches: [ "issue-851" ]
- 
+  pull_request:
+
 jobs:
-  run_master:
-    runs-on: ${{ matrix.os }}
+  build:
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python: ['3.9']
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        
-    - name: Set up Python
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python }}
-        
-    - name: venv activate
-      run: |
-        python -m venv test-venv
-        echo 'VIRTUAL_ENV=test-venv' >> $GITHUB_ENV
-        echo 'PATH=test-venv/bin:$PATH' >> $GITHUB_ENV
-        source test-venv/bin/activate
-        echo "VIRTUAL_ENV: $VIRTUAL_ENV"
+    - name: Checkout
+      uses: actions/checkout@v2
 
-    - name: Print PATH after append
-      run: echo $PATH    
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1.1.4
+      with:
+        version: 1.1.6
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v2
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
+
+    # - name: Update PATH
+    #   run: echo "::add-path::$(pwd)/.venv/bin"
+
+    - name: Run tests
+      run: |
+        source .venv/bin/activate
+        tox
+      env:
+        PLATFORM: ${{ matrix.platform }}
