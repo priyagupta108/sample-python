@@ -1,0 +1,26 @@
+name: Example Workflow
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download python 3.10
+        run: |
+          wget https://github.com/actions/python-versions/releases/download/3.10.12-5200619051/python-3.10.12-linux-20.04-x64.tar.gz -O ${{ runner.temp }}/python-3.10.12-linux-20.04-x64.tar.gz
+          mkdir ${{ runner.temp }}/python-3.10.12-linux-20.04-x64
+          tar -xzvf ${{ runner.temp }}/python-3.10.12-linux-20.04-x64.tar.gz -C ${{ runner.temp }}/python-3.10.12-linux-20.04-x64
+
+      - name: Run script
+        run: |
+          echo "run script"
+          bash setup.sh
+        working-directory: ${{ runner.temp }}/python-3.10.12-linux-20.04-x64
+
+      - run: echo "/opt/hostedtoolcache/Python/3.10.12/x64/" >> $GITHUB_PATH
+
+      - run: python --version
