@@ -1,5 +1,5 @@
 name: Example Workflow
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -7,20 +7,20 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Download python 3.10
         run: |
-          wget https://github.com/actions/python-versions/releases/download/3.10.12-5200619051/python-3.10.12-linux-20.04-x64.tar.gz -O ${{ runner.temp }}/python-3.10.12-linux-20.04-x64.tar.gz
-          mkdir ${{ runner.temp }}/python-3.10.12-linux-20.04-x64
-          tar -xzvf ${{ runner.temp }}/python-3.10.12-linux-20.04-x64.tar.gz -C ${{ runner.temp }}/python-3.10.12-linux-20.04-x64
+          curl -L "https://github.com/actions/python-versions/releases/download/3.10.11-4626646535/python-3.10.11-win32-x64.zip" --output ${{ runner.temp }}/python-3.10.11-win32-x64.zip
+          Expand-Archive -Path "${{ runner.temp }}/python-3.10.11-win32-x64.zip" -DestinationPath "${{ runner.temp }}/python-3.10.11-win32-x64"
 
       - name: Run script
         run: |
           echo "run script"
-          bash setup.sh
-        working-directory: ${{ runner.temp }}/python-3.10.12-linux-20.04-x64
+          ./setup.bat
+        working-directory: ${{ runner.temp }}/python-3.10.11-win32-x64
 
-      - run: echo "/opt/hostedtoolcache/Python/3.10.12/x64/" >> $GITHUB_PATH
+      - run: echo "${{ runner.temp }}/python-3.10.11-win32-x64" >> $env:Path
+        shell: pwsh
 
       - run: python --version
