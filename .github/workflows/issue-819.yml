@@ -1,26 +1,18 @@
-name: Example Workflow
-on: [push, pull_request]
+name: Python application test
+
+on: [push]
 
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Download python 3.10
-        run: |
-          curl -L "https://github.com/actions/python-versions/releases/download/3.10.11-4626646535/python-3.10.11-win32-x64.zip" --output ${{ runner.temp }}/python-3.10.11-win32-x64.zip
-          Expand-Archive -Path "${{ runner.temp }}/python-3.10.11-win32-x64.zip" -DestinationPath "${{ runner.temp }}/python-3.10.11-win32-x64"
-
-      - name: Run script
-        run: |
-          echo "run script"
-          ./setup.bat
-        working-directory: ${{ runner.temp }}/python-3.10.11-win32-x64
-
-      - run: echo "${{ runner.temp }}/python-3.10.11-win32-x64" >> $env:Path
-        shell: pwsh
-
-      - run: python --version
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: SMoraisAnsys/setup-python@test/no-pwshpath
+      with:
+        python-version: '3.10'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
