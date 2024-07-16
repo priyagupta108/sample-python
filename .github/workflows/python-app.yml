@@ -21,7 +21,9 @@ jobs:
       run: python --version
 
     - name: Modify PATH
-      run: echo "PATH=/custom/path:$PATH" >> $GITHUB_ENV
+    - run: echo '/some/path/dir' >>"${GITHUB_PATH}"
+    - run: echo 'PATH=/usr/bin:/bin' >>"${GITHUB_ENV}"
+    - run: echo "$PATH"
 
     - name: Display modified PATH
       run: echo $PATH
