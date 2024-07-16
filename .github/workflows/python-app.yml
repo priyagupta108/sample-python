@@ -1,45 +1,30 @@
-name: Build executables
+name: Python workflow with PATH manipulation
 
 on:
   push:
+    branches: [ issue-851 ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8]
-
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-        update-environment: false
+        python-version: '3.8'
 
-   
+    - name: Display original Python version
+      run: python --version
 
-    - name: Load cached venv
-      id: cached-poetry-dependencies
-      uses: actions/cache@v2
-      with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+    - name: Modify PATH
+      run: echo "/custom/path:$PATH" >> $GITHUB_ENV
 
-    - name: Install dependencies
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install --no-interaction --no-root
+    - name: Display modified PATH
+      run: echo $PATH
 
-    # - name: Update PATH
-    #   run: echo "::add-path::$(pwd)/.venv/bin"
-
-    - name: Run tests
-      run: |
-        source .venv/bin/activate
-        tox
-      env:
-        PLATFORM: ${{ matrix.platform }}
+    - name: Display Python version after PATH modification
+      run: python --version
