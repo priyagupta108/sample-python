@@ -21,10 +21,11 @@ jobs:
       run: python --version
 
     - name: Modify PATH
-      run: echo "PATH=/custom/path:$PATH" >> $GITHUB_PATH
+      run: echo "PATH=/custom/path:$PATH" >> $GITHUB_ENV
 
     - name: Display modified PATH
       run: echo $PATH
-
+    - name: Display modified PATH
+      run: echo $PATH
     - name: Display Python version after PATH modification
       run: python --version
