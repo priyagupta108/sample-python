@@ -15,7 +15,7 @@ jobs:
     - name: Setup Python
       uses: priyagupta108/setup-python@unzipwin
       with:
-        python-version: '3.11.7'
+        python-version: '3.11.6'
 
     - name: Install dependencies
       run: |
