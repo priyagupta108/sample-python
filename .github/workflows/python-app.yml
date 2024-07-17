@@ -12,16 +12,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
+       python-version: '3.x'
 
-    # - name: Display original Python version
-    #   run: python --version
+    - name: Prepend custom path
+      run: echo "/your/custom/path" >> $GITHUB_PATH
 
-    - name: Modify PATH
-      run: echo '/some/path/dir' >>"${GITHUB_PATH}"
    
   
 
