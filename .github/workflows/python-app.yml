@@ -17,16 +17,16 @@ jobs:
       with:
         python-version: '3.12'
 
-    - name: Display original Python version
-      run: python --version
+    # - name: Display original Python version
+    #   run: python --version
 
     - name: Modify PATH
       run: echo '/some/path/dir' >>"${GITHUB_PATH}"
    
   
 
-    - name: Display modified PATH
-      run: echo $PATH
+    # - name: Display modified PATH
+    #   run: echo $PATH
     - name: Display modified PATH
       run: echo $PATH
     - name: Display Python version after PATH modification
