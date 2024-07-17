@@ -1,21 +1,27 @@
-name: Reproduce Issue
+name: Unzip issue reproduce 
 
-on: [push]
+on:
+  push:
+    branches:
+      - unzip-issue
+ 
 
 jobs:
-  reproduce-issue:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+  build:
+    runs-on: self-hosted
+
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Add annotation
-        run: |
-         echo "::error file=app.py,line=10,endLine=20,col=15,endColumn=30::Something went wrong"
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
 
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+ 
