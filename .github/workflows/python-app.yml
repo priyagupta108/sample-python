@@ -15,7 +15,7 @@ jobs:
     - name: Setup Python
       uses: priyagupta108/setup-python@unzipwin
       with:
-        python-version: 'graalpy-22.3' 
+        python-version: 'graalpy-24.0.2' 
 
     - name: Install dependencies
       run: |
