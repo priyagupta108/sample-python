@@ -13,7 +13,8 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Setup Python
-      uses: priyagupta108/setup-python@unzipwin
+      uses: actions/setup-python@v5
+      # uses: priyagupta108/setup-python@unzipwin
       with:
         python-version: 'graalpy-24.0.2' 
 
