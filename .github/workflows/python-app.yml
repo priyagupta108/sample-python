@@ -17,8 +17,8 @@ jobs:
       # uses: actions/setup-python@v5
       uses: priyagupta108/setup-python@unzipwin
       with:
-        # python-version: 'pypy3.8-v7.3.10' 
-         python-version: 'graalpy-24.x' 
+        python-version: 'pypy3.8-v7.3.11' 
+         # python-version: 'graalpy-24.x' 
 
     - name: Install dependencies
       run: |
