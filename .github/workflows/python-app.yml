@@ -10,8 +10,9 @@ jobs:
     runs-on: self-hosted
 
     steps:
-    - name: Clear setup-python cache
+    - name: Delete cached Python versions
       run: |
         echo "Clearing setup-python cache..."
-        rm -rf ~/.setup-python/
+        Remove-Item -Recurse -Force $env:USERPROFILE\.setup-python
         echo "Cache cleared successfully."
+      shell: pwsh
