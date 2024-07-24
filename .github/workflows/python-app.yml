@@ -1,16 +1,17 @@
-name: Unzip issue reproduce 
+name: Clear Python Cache
+
 on:
   push:
     branches:
-      - unzip-issue
+      - unzip-issue  # Adjust this to the branch you want to trigger the workflow
 
 jobs:
-  build:
+  clear-cache:
     runs-on: self-hosted
-    # runs-on: windows-latest
 
     steps:
       - name: Clear any existing tool cache
         run: |
           mv "${{ runner.tool_cache }}" "${{ runner.tool_cache }}.old"
           mkdir -p "${{ runner.tool_cache }}"
+     
