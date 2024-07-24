@@ -3,16 +3,25 @@ on:
   push:
     branches:
       - unzip-issue
-
+  
 jobs:
-  clear-cache:
+  build:
     runs-on: self-hosted
+    # runs-on: windows-latest
+
     steps:
-    - name: Clear tool cache
-      shell: powershell
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      # uses: actions/setup-python@v5
+      uses: priyagupta108/setup-python@unzipwin
+      with:
+       python-version: '3.12' 
+        # python-version: 'pypy2.7-v7.3.12' 
+         # python-version: 'graalpy-24.x' 
+
+    - name: Install dependencies
       run: |
-        if (Test-Path -Path "C:\Users\priyagupta108\actions-runner\_work\_tool.old") {
-          Remove-Item -Recurse -Force "C:\Users\priyagupta108\actions-runner\_work\_tool.old"
-        }
-        mv "C:\Users\priyagupta108\actions-runner\_work\_tool" "C:\Users\priyagupta108\actions-runner\_work\_tool.old"
-        mkdir "C:\Users\priyagupta108\actions-runner\_work\_tool"
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
