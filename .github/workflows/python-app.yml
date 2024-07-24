@@ -5,12 +5,9 @@ on:
       - unzip-issue
 
 jobs:
-  build:
+  clear-cache:
     runs-on: self-hosted
-    # runs-on: windows-latest
-
     steps:
-     - name: Clear any existing tool cache
-       run: |
-          mv "${{ runner.tool_cache }}" "${{ runner.tool_cache }}.old"
-          mkdir -p "${{ runner.tool_cache }}"
+    - name: Clear tool cache
+      run: |
+        rm -rf /path/to/runner/_work/_tool
