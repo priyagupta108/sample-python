@@ -10,4 +10,9 @@ jobs:
     steps:
     - name: Clear tool cache
       run: |
-        rm -rf /path/to/runner/_work/_tool
+        if (Test-Path -Path "C:\Users\priyagupta108\actions-runner\_work\_tool.old") {
+          Remove-Item -Recurse -Force "C:\Users\priyagupta108\actions-runner\_work\_tool.old"
+        }
+        mv "C:\Users\priyagupta108\actions-runner\_work\_tool" "C:\Users\priyagupta108\actions-runner\_work\_tool.old"
+        mkdir "C:\Users\priyagupta108\actions-runner\_work\_tool"
+      shell: pwsh
