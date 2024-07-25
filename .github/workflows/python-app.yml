@@ -14,8 +14,8 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Setup Python
-      # uses: actions/setup-python@v5
-      uses: priyagupta108/setup-python@unzipwin
+      uses: actions/setup-python@v5
+      # uses: priyagupta108/setup-python@unzipwin
       with:
        python-version: '3.12' 
        architecture: 'arm64'
