@@ -27,7 +27,7 @@ jobs:
         python-version: |
             3.8
             3.9
-            pypy3.9-nightly
+            pypy3.8-nightly
             pypy3.8
             3.10
 
