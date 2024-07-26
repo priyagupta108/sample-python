@@ -3,11 +3,10 @@ on:
   push:
     branches:
       - unzip-issue
-      
   
 jobs:
   build:
-    runs-on: [self-hosted, macOS]
+    runs-on: self-hosted
     # runs-on: windows-latest
 
     steps:
@@ -18,9 +17,8 @@ jobs:
       # uses: actions/setup-python@v5
       uses: priyagupta108/setup-python@fix-windows-extract-archive
       with:
-       # python-version: '3.13.0-beta.4' 
-        # python-version: '3.6.x - 3.11.x'
-        python-version: 'pypy3.8' 
+       python-version: '3.12' 
+        # python-version: 'pypy2.7-v7.3.12' 
          # python-version: 'graalpy-24.x' 
 
     - name: Install dependencies
