@@ -1,9 +1,10 @@
 name: Unzip issue test in GitHub hosted
 
 on:
-  push:
-    branches:
-      - unzip-issue
+  # push:
+  #   branches:
+  #     - unzip-issue
+  workflow_dispatch 
 
 
 jobs:
