@@ -13,10 +13,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: clear
+    - name: Clear tool cache
+      shell: powershell
       run: |
-          mv "${{ runner.tool_cache }}" "${{ runner.tool_cache }}.old"
-          mkdir -p "${{ runner.tool_cache }}"
+        if (Test-Path -Path "C:\Users\priyagupta108\actions-runner\_work\_tool.old") {
+          Remove-Item -Recurse -Force "C:\Users\priyagupta108\actions-runner\_work\_tool.old"
+        }
+        mv "C:\Users\priyagupta108\actions-runner\_work\_tool" "C:\Users\priyagupta108\actions-runner\_work\_tool.old"
+        mkdir "C:\Users\priyagupta108\actions-runner\_work\_tool"
 
     - name: Setup Python
       # uses: actions/setup-python@v5
