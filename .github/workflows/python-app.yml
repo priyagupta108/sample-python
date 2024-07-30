@@ -21,6 +21,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Set up Poetry
+      if: matrix.cache == 'poetry'
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH   
+
     - name: Setup Python
       uses: Zxilly/setup-python@main
       with:
@@ -33,11 +39,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Set up Poetry
+    - name: poetry install
       if: matrix.cache == 'poetry'
       run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
         poetry install
 
     - name: Cache dependencies with Pipenv
