@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.12"]
-        cache: [pip, pipenv]
+        cache: [pip, poetry, pipenv]
 
     steps:
     - name: Checkout repository
