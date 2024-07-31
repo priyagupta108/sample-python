@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.12"]
+        python-version: ["3.12.3"]
         cache: [pip, poetry, pipenv]
 
     steps:
@@ -28,7 +28,7 @@ jobs:
         echo "$HOME/.local/bin" >> $GITHUB_PATH   
 
     - name: Setup Python
-      uses: Zxilly/setup-python@main
+      uses: priyagupta108/setup-python@fix-windows-extract-archive
       with:
         python-version: ${{ matrix.python-version }}
         cache: ${{ matrix.cache }}
