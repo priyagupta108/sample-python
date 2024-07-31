@@ -28,7 +28,8 @@ jobs:
         echo "$HOME/.local/bin" >> $GITHUB_PATH   
 
     - name: Setup Python
-      uses: priyagupta108/setup-python@fix-windows-extract-archive
+      # uses: priyagupta108/setup-python@fix-windows-extract-archive
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: ${{ matrix.cache }}
