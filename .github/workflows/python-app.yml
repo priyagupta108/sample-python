@@ -25,10 +25,9 @@ jobs:
       if: matrix.cache == 'poetry'
       run: |
        pipx install poetry
-       # shell: /usr/bin/bash -e {0}
-
+       
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: priyagupta108/setup-python@fix-windows-extract-archive
       with:
         python-version: ${{ matrix.python-version }}
         cache: ${{ matrix.cache }}
