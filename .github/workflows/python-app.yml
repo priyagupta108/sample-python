@@ -24,7 +24,8 @@ jobs:
     - name: Set up Poetry
       if: matrix.cache == 'poetry'
       run: |
-       run: pipx install poetry
+       pipx install poetry
+       # shell: /usr/bin/bash -e {0}
 
     - name: Setup Python
       uses: actions/setup-python@v5
