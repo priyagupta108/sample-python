@@ -2,7 +2,7 @@ name: Unzip issue reproduce
 on:
   push:
     branches:
-      - unzip
+      - unzip-issue
   
 jobs:
   build:
@@ -13,10 +13,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: clear
-      run: |
-          mv "${{ runner.tool_cache }}" "${{ runner.tool_cache }}.old"
-          mkdir -p "${{ runner.tool_cache }}"
+    # - name: clear
+    #   run: |
+    #       mv "${{ runner.tool_cache }}" "${{ runner.tool_cache }}.old"
+    #       mkdir -p "${{ runner.tool_cache }}"
     - name: Setup Python
       uses: actions/setup-python@main
       # uses: priyagupta108/setup-python@fix-windows-extract-archive
