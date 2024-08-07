@@ -6,14 +6,26 @@ on:
   
 jobs:
   build:
-    runs-on: [self-hosted, x64]
+    runs-on: [self-hosted, X64]
     # runs-on: windows-latest
 
     steps:
-  
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-    - name: cache clear
+    - name: clear
       run: |
           mv "${{ runner.tool_cache }}" "${{ runner.tool_cache }}.old"
           mkdir -p "${{ runner.tool_cache }}"
+    - name: Setup Python
+      uses: actions/setup-python@main
+      # uses: priyagupta108/setup-python@fix-windows-extract-archive
+      with:
+       python-version: '3.12' 
+        # python-version: 'pypy3.9' 
+         # python-version: 'graalpy-24.x' 
 
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
