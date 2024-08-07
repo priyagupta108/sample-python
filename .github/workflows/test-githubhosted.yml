@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ['3.9.12', '3.10.10', '3.11.8', '3.12.3']
+        # python-version: ['3.9.12', '3.10.10', '3.11.8', '3.12.3']
 
     steps:
     - name: Checkout code
@@ -21,7 +21,7 @@ jobs:
 
     - name: Setup Python
       # uses: priyagupta108/setup-python@fix-windows-extract-archive
-      uses: actions/setup-python@main
+      uses: actions/setup-python@v5
       with:
         # python-version: ${{ matrix.python-version }}
         python-version: |
