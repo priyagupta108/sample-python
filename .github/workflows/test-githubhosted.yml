@@ -23,13 +23,13 @@ jobs:
       # uses: priyagupta108/setup-python@fix-windows-extract-archive
       uses: actions/setup-python@main
       with:
-        python-version: ${{ matrix.python-version }}
-        # python-version: |
-        #     3.8
-        #     3.9
-        #     pypy3.8-nightly
-        #     pypy3.8
-        #     3.10
+        # python-version: ${{ matrix.python-version }}
+        python-version: |
+            3.8
+            3.9
+            pypy3.8-nightly
+            pypy3.8
+            3.10
 
     - name: Install dependencies
       run: |
