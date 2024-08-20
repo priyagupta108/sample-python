@@ -20,12 +20,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
-      - name: Display environment variables
-        run: |
-          echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
-          echo "LIBRARY_PATH: $LIBRARY_PATH"
+     
       - name: Check Python version
-        run: python --version
+        run: sudo python --version
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
