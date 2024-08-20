@@ -7,13 +7,14 @@ on:
 jobs:
   build:
     runs-on: [self-hosted, Linux]
-    strategy:
-      matrix:
-        # python-version: ['3.10', '3.12']
-        python-version: ['3.9']
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Install with sudo
+        run: |
+         sudo apt-get update
+         sudo apt-get install -y sudo
       - name: Ensure Sudo is Installed
         run: |
           if ! command -v sudo &> /dev/null; then
@@ -24,8 +25,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          python-version: '3.9.8'
 
      
       - name: Check Python version
