@@ -26,6 +26,16 @@ jobs:
           cache: 'pip'
           cache-dependency-path: '**/requirements*.txt'
 
+      - name: Python install
+        
+        run: |
+          # pip install
+          python --version
+        
+          python -m pip install -U pip "setuptools<72.1.0" wheel pytest pytest-cov  --ignore-installed
+
+           
+
       - name: Install poetry
         run: |
           python -m pip install poetry==1.8.3
