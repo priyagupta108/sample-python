@@ -33,6 +33,7 @@ jobs:
           python --version
         
           python -m pip install -U pip "setuptools<72.1.0" wheel pytest pytest-cov  --ignore-installed
+          python -m pip install -r requirements.txt --ignore-installed
 
            
 
