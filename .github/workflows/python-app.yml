@@ -17,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: priyagupta108/setup-node@fix-win-arm64-setup
         with:
-          node-version: '22.6.0'
+          node-version: '22.7.0'
 
       - name: Display Node.js version
         run: node -v
