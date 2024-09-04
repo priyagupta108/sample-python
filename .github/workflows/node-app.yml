@@ -7,7 +7,7 @@ jobs:
   
   publish-npm:
     
-    runs-on: windows-latest
+    runs-on: [self-hosted, Linux]
     permissions:
       contents: read
       packages: write
