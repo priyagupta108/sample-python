@@ -13,7 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    
+    - name: Install Yarn
+      run: npm install -g yarn
     - name: Setup Node.js
       uses: priyagupta108/setup-node@fix-win-arm64-setup
       with:
