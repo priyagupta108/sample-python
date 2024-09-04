@@ -1,23 +1,31 @@
-name: github Package
+
+     
+name: Node.js Package
+
 on:
   push:
     branches:
-      - sample-node
+      - pnpm-test
+
 jobs:
-  
-  publish-npm:
-    
+  build:
     runs-on: [self-hosted, Arm64]
-    permissions:
-      contents: read
-      packages: write
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: priyagupta108/setup-node@fix-win-arm64-setup
-        with:
-          node-version: '20'
-          cache: 'npm'
-          
-     
-      - run: npm ci
-     
+    - uses: actions/checkout@v4
+    - uses: pnpm/action-setup@v2
+      with:
+        version: latest
+
+    - name: Setup Node.js
+      uses: priyagupta108/setup-node@fix-win-arm64-setup
+      with:
+        node-version: '20'
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Test
+      run: pnpm test
+
