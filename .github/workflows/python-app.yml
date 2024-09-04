@@ -7,30 +7,17 @@ jobs:
   test-python-setup:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, macOS-13]
+        os: [ubuntu-latest]
         
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Set up Python from pyproject.toml
+      - name: Set up Python 
         uses: actions/setup-python@v5
         with:
-          python-version-file: pyproject.toml
+          python-version: 3.12.4
+          cache: 'pip'
       - name: Check Python version
         run: python --version
-  test-python-setup-fix:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, macOS-13]
-        
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Python from pyproject.toml
-        uses: priya-kinthali/setup-python@fix-935-toml
-        with:
-          python-version-file: pyproject.toml
-      - name: Check Python version
-        run: python --version
+ 
