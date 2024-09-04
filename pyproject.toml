@@ -1,0 +1,16 @@
+
+[tool.coverage.report]
+exclude_lines = [
+  "if TYPE_CHECKING:",
+  "pragma: no cover",
+  "raise NotImplementedError"
+]
+fail_under = 100
+omit = [
+  "**/tm_devices/commands/**"  # TODO: remove this exclusion
+]
+show_missing = true
+skip_empty = true
+
+[tool.poetry.dependencies]
+python = "^3.8"  # This is the main Python version requirement
