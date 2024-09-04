@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: priyagupta108/setup-node@fix-win-arm64-setup
         with:
-          node-version: 16
+          node-version: '20'
           cache: 'npm'
           registry-url: https://npm.pkg.github.com
      
