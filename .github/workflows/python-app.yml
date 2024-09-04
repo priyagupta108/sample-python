@@ -1,21 +1,36 @@
-name: Reproduce Issue
-
-on: [push]
-
+name: Test Python Setup with pyproject.toml
+on:
+  push:
+    branches:
+      - issue-815
 jobs:
-  reproduce-issue:
+  test-python-setup:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest, macOS-13]
+        
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Add annotation
-        run: |
-         echo "::error file=app.py,line=10,endLine=20,col=15,endColumn=30::Something went wrong"
-
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python from pyproject.toml
+        uses: priya-kinthali/setup-python@fix-935-toml
+        with:
+          python-version-file: pyproject.toml
+      - name: Check Python version
+        run: python --version
+  test-python-setup-fix:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest, macOS-13]
+        
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python from pyproject.toml
+        uses: priya-kinthali/setup-python@fix-935-toml
+        with:
+          python-version-file: pyproject.toml
+      - name: Check Python version
+        run: python --version
