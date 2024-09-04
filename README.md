@@ -1,1 +1,1 @@
-# sample-node
+# sample-python

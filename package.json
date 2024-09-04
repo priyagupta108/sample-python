@@ -1,12 +1,19 @@
 {
-  "name": "sample-python",
-  "version": "1.0.0",
+  "name": "@priyagupta108/sample-python",
+  "version": "1.0.4",
+  "description": "sample-python application",
   "main": "index.js",
-  "repository": "https://github.com/priyagupta108/sample-python.git",
-  "author": "Priyagupta108 <priyagupta108@github.com>",
-  "license": "MIT",
-  "dependencies": {
-    "express": "^4.19.2"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" "
   },
+  "author": "",
+  "license": "ISC",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/priyagupta108"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "repository": "https://github.com/priyagupta108/sample-python.git",
   "packageManager": "yarn@4.0.2"
 }
