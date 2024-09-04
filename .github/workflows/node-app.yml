@@ -15,8 +15,7 @@ jobs:
           node-version: 16
           cache: 'npm'
           registry-url: https://npm.pkg.github.com
-      - name: Initialize NPM with scope
-        run: npm init -y --scope ${{ github.repository_owner }}
+     
       - run: npm ci
       - run: npm publish
         env:
