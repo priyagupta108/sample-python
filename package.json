@@ -1,0 +1,15 @@
+{
+  "name": "@priyagupta108/sample-node",
+  "version": "1.0.3",
+  "description": "sample-node application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" "
+  },
+  "author": "Priyagupta108 <priyagupta108@github.com>",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "repository": "https://github.com/priyagupta108/sample-python.git"
+}

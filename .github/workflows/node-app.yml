@@ -1,0 +1,23 @@
+name: github Package
+on:
+  push:
+    branches:
+      - sample-node
+jobs:
+  
+  publish-npm:
+    
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: priyagupta108/setup-node@fix-win-arm64-setup
+        with:
+          node-version: 16
+          cache: 'npm'
+          registry-url: https://npm.pkg.github.com
+      - name: Initialize NPM with scope
+        run: npm init -y --scope ${{ github.repository_owner }}
+      - run: npm ci
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GIT_TOKEN}}
