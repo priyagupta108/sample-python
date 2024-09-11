@@ -26,8 +26,10 @@ jobs:
       - name: go clean
         run:  go clean -modcache
 
-      - name: Build shared library
-        run: go build -o lib.so -buildmode=c-shared
+      - name: Build
+        run: |
+         export CGO_ENABLED=1
+         go build -o lib.so -buildmode=c-shared
 
       - name: Test shared library
         run: python run.py
