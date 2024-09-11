@@ -8,7 +8,7 @@ on:
 
 jobs:
   golang:
-    runs-on: [ubuntu-lates]
+    runs-on: [ubuntu-latest]
     # runs-on: ${{ matrix.os }}
     # strategy:
     #   matrix:
