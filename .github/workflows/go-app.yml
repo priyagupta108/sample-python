@@ -8,7 +8,7 @@ on:
 
 jobs:
   golang:
-    runs-on: [self-hosted, linux-latest-x64]
+    runs-on: [self-hosted]
     # runs-on: ${{ matrix.os }}
     # strategy:
     #   matrix:
