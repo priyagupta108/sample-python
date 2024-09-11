@@ -27,7 +27,7 @@ jobs:
         run:  go clean -modcache
 
       - name: Build shared library
-        run: go build -tags azure -o lib.so -buildmode=c-shared
+        run: go build -o lib.so -buildmode=c-shared
 
       - name: Test shared library
         run: python run.py
