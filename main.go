@@ -1,4 +1,5 @@
-//+build linux darwin windows
+// go:build (darwin && cgo) || linux
+// +build darwin,cgo linux
 package main
 
 import (
