@@ -1,13 +1,18 @@
-// go:build (darwin && cgo) || linux
-// +build darwin,cgo linux
 package main
 
 import (
-	"C"
+    "fmt"
+    "net/http"
+    "github.com/gorilla/mux"
 )
 
-//export cNoop
-func cNoop() {
-}
+func main() {
+    r := mux.NewRouter()
 
-func main() {}
+    r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+    
+        fmt.Fprintf(w, "Hello, Web!")
+    })
+    http.Handle("/", r)
+    http.ListenAndServe(":8080", nil)
+}
