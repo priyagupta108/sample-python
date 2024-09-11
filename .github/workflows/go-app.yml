@@ -1,9 +1,9 @@
 name: Go test ci
 
 on:
-  push:
-    branches:
-      - sample-go
+  # push:
+  #   branches:
+  #     - sample-go
   workflow_dispatch:
 
 jobs:
