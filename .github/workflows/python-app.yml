@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-binary:
-    runs-on: macos-11
+    runs-on: macos-13
     steps:
       - run: |
           find /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages -name 'pip-*.dist-info'
