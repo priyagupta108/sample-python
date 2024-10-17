@@ -1,15 +1,7 @@
-name: Build and Release
-on:
-  push:
-    branches:
-      - '**'
-
+name: Check installed pip versions
+on: [pull_request, push, workflow_dispatch]
 jobs:
-  build-binary:
-    runs-on: macos-13
+  check_pip:
+    runs-on: ubuntu-latest
     steps:
-      - run: |
-          find /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages -name 'pip-*.dist-info'
-          pip3 show pip
-          pip3 install pip==23.0
-          pip3 show pip
+      - run: ls -l /opt/hostedtoolcache/Python/3.12.1/x64/lib/python3.12/site-packages
