@@ -10,3 +10,8 @@ jobs:
           python-version: '3.12.1'
           
       - run: ls -l /opt/hostedtoolcache/Python/3.12.1/x64/lib/python3.12/site-packages
+      - run: |
+          find /Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages -name 'pip-*.dist-info'
+          pip3 show pip
+          pip3 install pip==23.0
+          pip3 show pip
