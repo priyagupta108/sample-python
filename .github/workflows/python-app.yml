@@ -11,7 +11,8 @@ jobs:
         with:
           python-version: "3.11"
       - run: |
-          find /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages -name 'pip-*.dist-info'
           pip show pip
           pip install pip==23.0
           pip show pip
+          find /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages -name 'pip-*.dist-info'
+         
