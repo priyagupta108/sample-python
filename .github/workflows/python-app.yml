@@ -2,16 +2,15 @@ name: Check installed pip versions
 on: [pull_request, push, workflow_dispatch]
 jobs:
   check_pip:
-    runs-on: ubuntu-latest
+   
+    runs-on: macos-13
     steps:
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12.1'
-          
-      - run: ls -l /opt/hostedtoolcache/Python/3.12.1/x64/lib/python3.12/site-packages
       - run: |
-          find /Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages -name 'pip-*.dist-info'
-          pip3 show pip
-          pip3 install pip==23.0
-          pip3 show pip
+          find /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages -name 'pip-*.dist-info'
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          pip show pip
+          pip install pip==23.0
+          pip show pip
