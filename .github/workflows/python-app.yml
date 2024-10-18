@@ -4,4 +4,9 @@ jobs:
   check_pip:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.1'
+          
       - run: ls -l /opt/hostedtoolcache/Python/3.12.1/x64/lib/python3.12/site-packages
