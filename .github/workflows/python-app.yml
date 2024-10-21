@@ -1,20 +1,26 @@
-name: Check installed pip versions
-on: [pull_request, push, workflow_dispatch]
+name: main
+
+on: [push, workflow_dispatch]
+
 jobs:
-  check_pip:
-   
-    runs-on: macos-12
+  test:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version:
+          - "pypy-3.7"
+          - "pypy-3.8"
+          - "pypy-3.9"
+      fail-fast: false
     steps:
-      - run: |
-          find /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages -name 'pip-*.dist-info'
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v3
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Set up python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
-      - run: |
-          pip show pip
-          pip install pip==23.0
-          pip show pip
-          find /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages -name 'pip-*.dist-info'
-         
-      - run: |
-          find /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages -name 'pip-*.dist-info'
+          python-version: ${{ matrix.python-version }}
+          cache: "poetry"
+      - name: Install dependencies
+        run: poetry install --sync
+      - run: poetry run python --version
