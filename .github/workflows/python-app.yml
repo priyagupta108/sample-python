@@ -18,6 +18,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install --user pipx
 
   reproduce-issue-ubuntu-24:
     runs-on: ubuntu-24.04
@@ -34,3 +35,4 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install --user pipx
