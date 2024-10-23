@@ -8,9 +8,12 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - "pypy-3.7"
-          - "pypy-3.8"
-          - "pypy-3.9"
+          # - "pypy-3.7"
+          # - "pypy-3.8"
+          # - "pypy-3.9",
+          - pypy-3.7-v7.3.9
+          - pypy-3.8-v7.3.11
+          - pypy-3.9-v7.3.11
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
