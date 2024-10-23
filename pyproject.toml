@@ -19,5 +19,5 @@ description = "A short description of your package"
 authors = ["Your Name <your.email@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.9"
 requests = "^2.28.2"
