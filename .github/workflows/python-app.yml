@@ -48,7 +48,7 @@ jobs:
           LATEST_COMMIT=$(git rev-parse HEAD)
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           gh release create $LATEST_TAG --draft --title "Release $LATEST_TAG" \
-            "./dist/*.tgz" \
+         
             "dist/asset.zip#sample-python-$LATEST_TAG.zip"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
