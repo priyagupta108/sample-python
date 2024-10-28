@@ -28,17 +28,30 @@ jobs:
         run: |
           git tag -a ${{ github.event.inputs.tool-version }} -m "Release ${{ github.event.inputs.tool-version }}"
           git push origin ${{ github.event.inputs.tool-version }}
+
       - name: Publish Release
         id: create_release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
         run: |
           LATEST_COMMIT=$(git rev-parse HEAD)
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           gh release create $LATEST_COMMIT --draft --title "Release $LATEST_COMMIT" \
-            --repo="$GITHUB_REPOSITORY" \
-            --title="${LATEST_TAG#v}" \
-            --generate-notes \
-            "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.zip#sample-python-$LATEST_TAG.zip" \
-            "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.tar.gz#sample-python-$LATEST_TAG.tar.gz"
+            --tag "${{ inputs.tool-version }}-${{ github.run_id }}" \
+            --notes "${{ steps.generate-release-body.outputs.RELEASE_BODY }}" \
+            "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.zip#versions-package-tools-$LATEST_TAG.zip" \
+            "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.tar.gz#versions-package-tools-$LATEST_TAG.tar.gz"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+      # - name: Publish Release
+      #   id: create_release
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     tag: ${{ github.ref_name }}
+      #   run: |
+      #     LATEST_COMMIT=$(git rev-parse HEAD)
+      #     LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+      #     gh release create $LATEST_COMMIT --draft --title "Release $LATEST_COMMIT" \
+      #       --repo="$GITHUB_REPOSITORY" \
+      #       --title="${LATEST_TAG#v}" \
+      #       --generate-notes \
+      #       "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.zip#sample-python-$LATEST_TAG.zip" \
+      #       "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.tar.gz#sample-python-$LATEST_TAG.tar.gz"
