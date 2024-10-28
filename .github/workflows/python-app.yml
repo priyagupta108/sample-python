@@ -29,18 +29,38 @@ jobs:
           git tag -a ${{ github.event.inputs.tool-version }} -m "Release ${{ github.event.inputs.tool-version }}"
           git push origin ${{ github.event.inputs.tool-version }}
 
+      # - name: Publish Release
+      #   id: create_release
+      #   run: |
+      #     LATEST_COMMIT=$(git rev-parse HEAD)
+      #     LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+      #     gh release create $LATEST_COMMIT --draft --title "Release $LATEST_COMMIT" \
+      #       --tag "${{ inputs.tool-version }}-${{ github.run_id }}" \
+      #       --notes "${{ steps.generate-release-body.outputs.RELEASE_BODY }}" \
+      #       "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.zip#versions-package-tools-$LATEST_TAG.zip" \
+      #       "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.tar.gz#versions-package-tools-$LATEST_TAG.tar.gz"
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+
       - name: Publish Release
         id: create_release
         run: |
           LATEST_COMMIT=$(git rev-parse HEAD)
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-          gh release create $LATEST_COMMIT --draft --title "Release $LATEST_COMMIT" \
-            --tag "${{ inputs.tool-version }}-${{ github.run_id }}" \
-            --notes "${{ steps.generate-release-body.outputs.RELEASE_BODY }}" \
-            "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.zip#versions-package-tools-$LATEST_TAG.zip" \
-            "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.tar.gz#versions-package-tools-$LATEST_TAG.tar.gz"
+          gh release create $LATEST_TAG --draft --title "Release $LATEST_TAG" \
+            "./dist/*.tgz" \
+            "dist/asset.zip#sample-python-$LATEST_TAG.zip"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+
+        #    - name: Create release
+        # id: create-release
+        # run: |
+        #   gh release create ${{ github.ref_name }} --draft --title "Release ${{ github.ref_name }}" \
+        #     '${{ steps.prepare-artifacts.outputs.vsix_path }}#${{ format('vscode-codeql-{0}.vsix', steps.prepare-artifacts.outputs.ref_name) }}' \
+        #     'dist/vscode-codeql-sourcemaps.zip#${{ format('vscode-codeql-sourcemaps-{0}.zip', steps.prepare-artifacts.outputs.ref_name) }}'
+        # env:
+        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # - name: Publish Release
       #   id: create_release
       #   env:
