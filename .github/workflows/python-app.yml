@@ -38,5 +38,5 @@ jobs:
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           gh release create "${{ github.event.inputs.tool-version }}-${{ github.run_id }}" --draft --title "Release $LATEST_COMMIT" \
             --notes "${{ steps.generate-release-body.outputs.RELEASE_BODY }}" \
-            "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.zip#sample-python-$LATEST_TAG.zip" \
-            "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.tar.gz#sample-python-$LATEST_TAG.tar.gz"
+            "https://github.com/priyagupta108/sample-python/tags/$LATEST_TAG.zip#sample-python-$LATEST_TAG.zip" \
+            "https://github.com/priyagupta108/sample-python/tags/$LATEST_TAG.tar.gz#sample-python-$LATEST_TAG.tar.gz"
