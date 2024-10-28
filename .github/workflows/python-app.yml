@@ -1,15 +1,15 @@
 name: Test Publish Release
 
 on:
-  push:
-   # workflow_dispatch:
-    # inputs:
-    #   tool-version:
-    #     description: 'The version of the tool to release'
-    #     required: true
-    #     default: 'v1.0.1'
-    tags:
-      - "v*"
+  # push:
+   workflow_dispatch:
+    inputs:
+      tool-version:
+        description: 'The version of the tool to release'
+        required: true
+        default: 'v1.0.1'
+    # tags:
+    #   - "v*"
 
 permissions:
   contents: write
