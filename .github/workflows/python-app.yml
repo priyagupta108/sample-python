@@ -1,15 +1,15 @@
 name: Test Publish Release
 
 on:
-  # push:
-   workflow_dispatch:
-    inputs:
-      tool-version:
-        description: 'The version of the tool to release'
-        required: true
-        default: 'v1.0.1'
-    # tags:
-    #   - "v*"
+  push:
+   # workflow_dispatch:
+    # inputs:
+    #   tool-version:
+    #     description: 'The version of the tool to release'
+    #     required: true
+    #     default: 'v1.0.1'
+    tags:
+      - "v*"
 
 permissions:
   contents: write
@@ -21,15 +21,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Configure Git User
-        run: |
-          git config --global user.email "priyagupta108@github.com"
-          git config --global user.name "priya gupta"
+      # - name: Configure Git User
+      #   run: |
+      #     git config --global user.email "priyagupta108@github.com"
+      #     git config --global user.name "priya gupta"
 
-      - name: Tag and Push Release
-        run: |
-          git tag -a v1.0.1 -m "Initial release"
-          git push origin v1.0.1
+      # - name: Tag and Push Release
+      #   run: |
+      #     git tag -a v1.0.1 -m "Initial release"
+      #     git push origin v1.0.1
       - name: Publish Release
         id: create_release
         env:
