@@ -47,31 +47,8 @@ jobs:
         run: |
           LATEST_COMMIT=$(git rev-parse HEAD)
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-          gh release create $LATEST_TAG --draft --title "Release $LATEST_TAG" \
-         
-            "dist/asset.zip#sample-python-$LATEST_TAG.zip"
+          gh release create $LATEST_TAG --draft --title "Release $LATEST_TAG" 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
 
-        #    - name: Create release
-        # id: create-release
-        # run: |
-        #   gh release create ${{ github.ref_name }} --draft --title "Release ${{ github.ref_name }}" \
-        #     '${{ steps.prepare-artifacts.outputs.vsix_path }}#${{ format('vscode-codeql-{0}.vsix', steps.prepare-artifacts.outputs.ref_name) }}' \
-        #     'dist/vscode-codeql-sourcemaps.zip#${{ format('vscode-codeql-sourcemaps-{0}.zip', steps.prepare-artifacts.outputs.ref_name) }}'
-        # env:
-        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # - name: Publish Release
-      #   id: create_release
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     tag: ${{ github.ref_name }}
-      #   run: |
-      #     LATEST_COMMIT=$(git rev-parse HEAD)
-      #     LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-      #     gh release create $LATEST_COMMIT --draft --title "Release $LATEST_COMMIT" \
-      #       --repo="$GITHUB_REPOSITORY" \
-      #       --title="${LATEST_TAG#v}" \
-      #       --generate-notes \
-      #       "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.zip#sample-python-$LATEST_TAG.zip" \
-      #       "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.tar.gz#sample-python-$LATEST_TAG.tar.gz"
+      
