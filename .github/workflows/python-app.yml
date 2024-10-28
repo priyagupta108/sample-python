@@ -2,8 +2,8 @@ name: Test Publish Release
 
 on:
   push:
-    # tags:
-    #   - "v*"
+    tags:
+      - "v*"
 
 permissions:
   contents: write
@@ -27,5 +27,6 @@ jobs:
           gh release create $LATEST_COMMIT --draft --title "Release $LATEST_COMMIT" \
             --tag "${{ inputs.tool-version }}-${{ github.run_id }}" \
             --notes "${{ steps.generate-release-body.outputs.RELEASE_BODY }}" \
-            "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.zip#versions-package-tools-$LATEST_TAG.zip" \
-            "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.tar.gz#versions-package-tools-$LAT
+            "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.zip#sample-python-$LATEST_TAG.zip" \
+            "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.tar.gz#sample-python-$LATEST_TAG.tar.gz"
+     
