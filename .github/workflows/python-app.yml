@@ -1,15 +1,12 @@
 name: Test Publish Release
 
 on:
-  # push:
-   workflow_dispatch:
+  workflow_dispatch:
     inputs:
       tool-version:
         description: 'The version of the tool to release'
         required: true
         default: 'v1.0.1'
-    # tags:
-    #   - "v*"
 
 permissions:
   contents: write
@@ -21,20 +18,21 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      # - name: Configure Git User
-      #   run: |
-      #     git config --global user.email "priyagupta108@github.com"
-      #     git config --global user.name "priya gupta"
 
-      # - name: Tag and Push Release
-      #   run: |
-      #     git tag -a v1.0.1 -m "Initial release"
-      #     git push origin v1.0.1
+      - name: Configure Git User
+        run: |
+          git config --global user.email "priyagupta108@github.com"
+          git config --global user.name "priya gupta"
+
+      - name: Tag and Push Release
+        run: |
+          git tag -a ${{ github.event.inputs.tool-version }} -m "Release ${{ github.event.inputs.tool-version }}"
+          git push origin ${{ github.event.inputs.tool-version }}
+
       - name: Publish Release
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
         run: |
           LATEST_COMMIT=$(git rev-parse HEAD)
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
@@ -42,4 +40,3 @@ jobs:
             --notes "${{ steps.generate-release-body.outputs.RELEASE_BODY }}" \
             "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.zip#sample-python-$LATEST_TAG.zip" \
             "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.tar.gz#sample-python-$LATEST_TAG.tar.gz"
-     
