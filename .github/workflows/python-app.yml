@@ -15,6 +15,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Configure Git User
+        run: |
+          git config --global user.email "priyagupta108@github.com"
+          git config --global user.name "priya gupta"
+
       - name: Tag and Push Release
         run: |
           git tag -a v1.0 -m "Initial release"
