@@ -34,11 +34,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
         run: |
-          LATEST_COMMIT=$(git rev-parse HEAD)
-          LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-          gh release create $LATEST_COMMIT --draft --title "Release $LATEST_COMMIT" \
-            --tag "${{ inputs.tool-version }}-${{ github.run_id }}" \
-            --notes "${{ steps.generate-release-body.outputs.RELEASE_BODY }}" \
+            LATEST_COMMIT=$(git rev-parse HEAD)
+            LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+            gh release create $LATEST_COMMIT --draft --title "Release $LATEST_COMMIT" \
              "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.zip#sample-python-$LATEST_TAG.zip" \
              "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.tar.gz#sample-python-$LATEST_TAG.tar.gz"
 
