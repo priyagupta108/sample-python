@@ -1,29 +1,26 @@
-name: main
+name: Test Publish Release
 
-on: [push, workflow_dispatch]
+on:
+  workflow_dispatch:
 
 jobs:
-  test:
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        python-version:
-          # - "pypy-3.7"
-          # - "pypy-3.8"
-          # - "pypy-3.9",
-          - pypy-3.7-v7.3.9
-          - pypy-3.8-v7.3.11
-          - pypy-3.9-v7.3.11
-      fail-fast: false
+  test-publish-release:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Poetry
-        run: pipx install poetry
-      - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: "poetry"
-      - name: Install dependencies
-        run: poetry install 
-      - run: poetry run python --version
+
+      - name: Set up GitHub CLI
+        uses: actions/setup-gh@v2
+
+      - name: Publish Release
+        id: create_release
+        run: |
+          LATEST_COMMIT=$(git rev-parse HEAD)
+          LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+          gh release create $LATEST_COMMIT --draft --title "Release $LATEST_COMMIT" \
+            --tag "${{ inputs.tool-version }}-${{ github.run_id }}" \
+            --notes "${{ steps.generate-release-body.outputs.RELEASE_BODY }}" \
+            "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.zip#versions-package-tools-$LATEST_TAG.zip" \
+            "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.tar.gz#versions-package-tools-$LATEST_TAG.tar.gz"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
