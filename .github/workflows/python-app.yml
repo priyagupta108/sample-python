@@ -1,19 +1,23 @@
 name: Test Publish Release
 
 on:
-  workflow_dispatch:
+  push:
+    # tags:
+    #   - "v*"
+
+permissions:
+  contents: write
 
 jobs:
-  test-publish-release:
+  release:
+    name: Release pushed tag
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up GitHub CLI
-        uses: actions/setup-gh@v2
-
       - name: Publish Release
         id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
         run: |
           LATEST_COMMIT=$(git rev-parse HEAD)
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
@@ -21,6 +25,4 @@ jobs:
             --tag "${{ inputs.tool-version }}-${{ github.run_id }}" \
             --notes "${{ steps.generate-release-body.outputs.RELEASE_BODY }}" \
             "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.zip#versions-package-tools-$LATEST_TAG.zip" \
-            "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.tar.gz#versions-package-tools-$LATEST_TAG.tar.gz"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.tar.gz#versions-package-tools-$LAT
