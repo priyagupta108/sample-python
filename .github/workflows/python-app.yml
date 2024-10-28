@@ -7,7 +7,7 @@ on:
       tool-version:
         description: 'The version of the tool to release'
         required: true
-        default: 'v1.0.0'
+        default: 'v1.0.1'
     # tags:
     #   - "v*"
 
@@ -28,8 +28,8 @@ jobs:
 
       - name: Tag and Push Release
         run: |
-          git tag -a v1.0.0 -m "Initial release"
-          git push origin v1.0.0
+          git tag -a v1.0.1 -m "Initial release"
+          git push origin v1.0.1
       - name: Publish Release
         id: create_release
         env:
