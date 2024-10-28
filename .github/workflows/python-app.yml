@@ -6,7 +6,7 @@ on:
       tool-version:
         description: 'The version of the tool to release'
         required: true
-        default: 'v1.0.1'
+        default: 'v1.0.0'
 
 permissions:
   contents: write
@@ -36,11 +36,7 @@ jobs:
         run: |
           LATEST_COMMIT=$(git rev-parse HEAD)
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-
-          # Retry mechanism for the release assets
-          for i in {1..5}; do
-            gh release create "${{ github.event.inputs.tool-version }}-${{ github.run_id }}" --draft --title "Release $LATEST_COMMIT" \
-              --notes "" \
-              "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.zip#sample-python-$LATEST_TAG.zip" \
-              "https://github.com/priyagupta108/sample-python/archive/refs/tags/$LATEST_TAG.tar.gz#sample-python-$LATEST_TAG.tar.gz" && break || sleep 10
-          done
+          gh release create "${{ github.event.inputs.tool-version }}-${{ github.run_id }}" --draft --title "Release $LATEST_COMMIT" \
+            --notes "${{ steps.generate-release-body.outputs.RELEASE_BODY }}" \
+            "https://github.com/priyagupta108/sample-python/releases/tag/$LATEST_TAG.zip#sample-python-$LATEST_TAG.zip" \
+            "https://github.com/priyagupta108/sample-python/releases/tag/$LATEST_TAG.tar.gz#sample-python-$LATEST_TAG.tar.gz"
