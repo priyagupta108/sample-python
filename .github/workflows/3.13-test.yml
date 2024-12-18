@@ -6,7 +6,7 @@ jobs:
   tests-poetry:
     strategy:
       matrix:
-        os: [ macos-latest, macos-13, ubuntu-latest, windows-latest]
+        os: [ macos-latest, macos-13, ubuntu-latest, windows-latest, ubuntu-22.04]
         python-version: [ "3.13"]
       fail-fast: false
     name: Py ${{ matrix.python-version }} - ${{ matrix.os }}
