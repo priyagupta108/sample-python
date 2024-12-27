@@ -3,18 +3,19 @@ name: Test Python
 on: [push, pull_request]
 
 jobs:
-  tests-poetry:
+  build:
+    name: Build distribution 📦
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [linux-24-x64, linux-22-x64]
-        python-version: [ "3.10.15", "3.10.16"]
-      fail-fast: false
-    name: Py ${{ matrix.python-version }} - ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+        python-version: ["3.12"]
+        os: [ubuntu-latest]
+        arch: [arm64]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-            python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.arch }}
             
