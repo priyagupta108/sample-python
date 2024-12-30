@@ -10,7 +10,7 @@ jobs:
       matrix:
         python-version: ["3.12.7"]
         os: [ubuntu-latest]
-        arch: [arm64]
+        # arch: [arm64]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
