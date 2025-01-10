@@ -1,2 +1,10 @@
+[tool.poetry]
+name = "your-project-name"
+version = "0.1.0"
+description = "A description of your project"
+authors = ["Your Name <your.email@example.com>"]
+
+
+
 [tool.poetry.group.main.dependencies]
-python = "^3.9"
+python = "3.9"
