@@ -10,10 +10,14 @@ jobs:
     - name: Install Poetry
       run: pipx install poetry
     - name: Set up Python version
-      # uses: priyagupta108/setup-python@test-pr-745
-      uses: actions/setup-python@v5
+      uses: priyagupta108/setup-python@test-pr-745
+      # uses: actions/setup-python@v5
       with:
         python-version-file: 'pyproject.toml'
     - name: Install dependencies
-      run: poetry install --sync
+      run: poetry install
+
+    - name: Run tests
+      run: poetry run pytest     
+      
     - run: poetry run python --version
