@@ -1,23 +1,4 @@
-
-[tool.coverage.report]
-exclude_lines = [
-  "if TYPE_CHECKING:",
-  "pragma: no cover",
-  "raise NotImplementedError"
-]
-fail_under = 100
-omit = [
-  "**/tm_devices/commands/**"  # TODO: remove this exclusion
-]
-show_missing = true
-skip_empty = true
-
-[tool.poetry]
-name = "your-package-name"
-version = "0.1.0"
-description = "A short description of your package"
-authors = ["Your Name <your.email@example.com>"]
-
 [tool.poetry.dependencies]
-python = ">=3.6"
-requests = "^2.28.2"
+python = "^3.8"
+
+[tool.poetry.group.main.dependencies]
