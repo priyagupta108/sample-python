@@ -7,4 +7,4 @@ authors = ["Your Name <your.email@example.com>"]
 
 
 [tool.poetry.group.main.dependencies]
-python = "3.12"
+python = "3.12.3"
