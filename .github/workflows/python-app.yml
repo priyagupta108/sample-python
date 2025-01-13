@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.13t']
+        python-version: ['3.13.1']
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -16,6 +16,7 @@ jobs:
       # uses: actions/setup-python@v4
       uses: priya-kinthali/setup-python@freethread-pr-319
       with:
+        architecture: x64-freethreaded
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
