@@ -1,54 +1,52 @@
-name: Test Publish Release
+name: Test Setup Python with Cache
 
 on:
-  workflow_dispatch:
-    inputs:
-      tool-version:
-        description: 'The version of the tool to release'
-        required: true
-        default: 'v1.0.0'
-
-permissions:
-  contents: write
+  push:
+    branches:
+      - test-pr-896
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  release:
-    name: Release pushed tag
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.12.3"]
+        cache: [pip, poetry, pipenv]
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Configure Git User
-        run: |
-          git config --global user.email "priyagupta108@github.com"
-          git config --global user.name "priya gupta"
+    - name: Set up Poetry
+      if: matrix.cache == 'poetry'
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH   
 
-      - name: Tag and Push Release
-        run: |
-          git tag -a ${{ github.event.inputs.tool-version }} -m "Release ${{ github.event.inputs.tool-version }}"
-          git push origin ${{ github.event.inputs.tool-version }}
+    - name: Setup Python
+      uses: priyagupta108/setup-python@upgrade-cache-4.0.0
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: ${{ matrix.cache }}
 
-      # - name: Publish Release
-      #   id: create_release
-      #   run: |
-      #     LATEST_COMMIT=$(git rev-parse HEAD)
-      #     LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-      #     gh release create $LATEST_COMMIT --draft --title "Release $LATEST_COMMIT" \
-      #       --tag "${{ inputs.tool-version }}-${{ github.run_id }}" \
-      #       --notes "${{ steps.generate-release-body.outputs.RELEASE_BODY }}" \
-      #       "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.zip#versions-package-tools-$LATEST_TAG.zip" \
-      #       "https://github.com/actions/versions-package-tools/archive/refs/tags/$LATEST_TAG.tar.gz#versions-package-tools-$LATEST_TAG.tar.gz"
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+    - name: Cache dependencies with pip
+      if: matrix.cache == 'pip'
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Publish Release
-        id: create_release
-        run: |
-          LATEST_COMMIT=$(git rev-parse HEAD)
-          LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-          gh release create $LATEST_TAG --draft --title "Release $LATEST_TAG" 
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+    - name: poetry install
+      if: matrix.cache == 'poetry'
+      run: |
+        poetry install
 
-      
+    - name: Cache dependencies with Pipenv
+      if: matrix.cache == 'pipenv'
+      run: |
+        pip install --upgrade pip
+        pip install pipenv
+        pipenv install
