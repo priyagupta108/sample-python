@@ -42,7 +42,7 @@ jobs:
     - name: poetry install
       if: matrix.cache == 'poetry'
       run: |
-        poetry install
+        poetry install --no-root
 
     - name: Cache dependencies with Pipenv
       if: matrix.cache == 'pipenv'
