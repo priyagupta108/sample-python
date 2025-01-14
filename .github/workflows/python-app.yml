@@ -4,17 +4,20 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ['3.13.1']
+        python-version: ['3.13.1', '3.13t']
+        os: ["windows-latest", "ubuntu-latest", "macos-13", macos-latest]
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      # uses: actions/setup-python@v5
       # uses: priya-kinthali/setup-python@freethread-pr-319
+      uses: priyagupta108/setup-python@test-pr-973
+      
       with:
         # architecture: x64-freethreaded
         python-version: ${{ matrix.python-version }}
