@@ -21,7 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
-        uses: quansight-labs/setup-python@v5
+        # uses: quansight-labs/setup-python@v5
+        uses: priyagupta108/setup-python@test-pr-973
         with:
           python-version: "3.13t"
           architecture: ${{ matrix.architecture }}
