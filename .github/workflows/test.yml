@@ -26,6 +26,7 @@ jobs:
           python-version: |
               3.13t
               3.13
+              
           architecture: ${{ matrix.architecture }}
       # - name: Set up Python
       #   uses: quansight-labs/setup-python@v5
@@ -43,8 +44,8 @@ jobs:
           fi
           which python
           which python3
-          which python3.13 || true
+          which python3.13 
           which python3.13t
-          python3.13 -VV || python3 -VV
+          python3.13 -VV
           python3.13t -VV
         shell: bash
