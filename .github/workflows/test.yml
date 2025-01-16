@@ -20,19 +20,13 @@ jobs:
             architecture: "arm64"
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+
+      - uses: priyagupta108/setup-python@test-pr-973
         with:
           python-version: |
-              3.11
-              3.12
+              3.13t
               3.13
-          architecture: ${{ matrix.architecture }}     
-      # - uses: priyagupta108/setup-python@test-pr-973
-      #   with:
-      #     python-version: |
-      #         3.13t
-      #         3.13
-      #     architecture: ${{ matrix.architecture }}
+          architecture: ${{ matrix.architecture }}
       # - name: Set up Python
       #   uses: quansight-labs/setup-python@v5
       #   # uses: priyagupta108/setup-python@test-pr-973
@@ -50,9 +44,7 @@ jobs:
           which python
           which python3
           which python3.13 || true
-          # which python3.13t
-          which python3.12
+          which python3.13t
           python3.13 -VV || python3 -VV
-          # python3.13t -VV
-          python3.12 -VV
+          python3.13t -VV
         shell: bash
