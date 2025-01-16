@@ -50,7 +50,9 @@ jobs:
           which python
           which python3
           which python3.13 || true
-          which python3.13t
+          # which python3.13t
+          which python3.12
           python3.13 -VV || python3 -VV
-          python3.13t -VV
+          # python3.13t -VV
+          python3.12 -VV
         shell: bash
