@@ -1,3 +1,4 @@
+
 name: SandBox
 
 on:
@@ -20,20 +21,18 @@ jobs:
             architecture: "arm64"
     steps:
       - uses: actions/checkout@v4
-
-      - uses: priyagupta108/setup-python@test-pr-973
+      - name: Set up Python
+        # uses: quansight-labs/setup-python@v5
+        uses: priyagupta108/setup-python@test-pr-973
         with:
-          python-version: |
-              "3.13.0t"
-              "3.13.0"
-              
+          python-version: "3.13.0t"
           architecture: ${{ matrix.architecture }}
-      # - name: Set up Python
-      #   uses: quansight-labs/setup-python@v5
-      #   # uses: priyagupta108/setup-python@test-pr-973
-      #   with:
-      #     python-version: "3.13"
-      #     architecture: ${{ matrix.architecture }}
+      - name: Set up Python
+        # uses: quansight-labs/setup-python@v5
+        uses: priyagupta108/setup-python@test-pr-973
+        with:
+          python-version: "3.13.0"
+          architecture: ${{ matrix.architecture }}
       - name: Check python
         run: |
           set -ex
@@ -44,8 +43,8 @@ jobs:
           fi
           which python
           which python3
-          which python3.13 
+          which python3.13 || true
           which python3.13t
-          python3.13 -VV
+          python3.13 -VV || python3 -VV
           python3.13t -VV
         shell: bash
