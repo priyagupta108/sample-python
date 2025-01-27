@@ -1,9 +1,11 @@
 name: Test Matrix Python Versions
 
 on:
-  push:
-    branches:
-      - python-freethreaded-test
+  workflow_dispatch:
+    
+  # push:
+  #   branches:
+  #     - python-freethreaded-test
 
 jobs:
   test:

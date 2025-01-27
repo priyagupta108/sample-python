@@ -2,7 +2,7 @@
 name: SandBox
 
 on:
-  push:
+  # push:
   workflow_dispatch:
 
 jobs:
