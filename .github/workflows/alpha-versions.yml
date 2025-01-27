@@ -14,9 +14,7 @@ jobs:
         os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
         python-version:
           - '3.14.0t-alpha.3'
-          - '3.14.0t-alpha.4'
           - '3.14.0-alpha.3t'
-          - '3.14.0-alpha.4t'
           - '3.14.0ta3'
           
     steps:
