@@ -9,7 +9,6 @@ jobs:
       matrix:
         python-version:
           - "3.13"
-        
       fail-fast: false
       
     steps:
@@ -17,7 +16,7 @@ jobs:
       - name: Install Poetry
         run: pipx install poetry
       - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: "poetry"
