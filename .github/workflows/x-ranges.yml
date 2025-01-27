@@ -21,6 +21,7 @@ jobs:
         uses: priyagupta108/setup-python@test-pr-973
         with:
           python-version: ${{ matrix.python-version }}
+          check-latest: true
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -41,6 +42,7 @@ jobs:
         uses: priyagupta108/setup-python@test-pr-973
         with:
           python-version: ${{ matrix.python-version }}
+          check-latest: true
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
