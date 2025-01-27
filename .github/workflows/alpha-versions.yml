@@ -16,6 +16,7 @@ jobs:
           - '3.14.0t-alpha.3'
           - '3.14.0-alpha.3t'
           - '3.14.0ta3'
+          - '3.14.0a3t'
           
     steps:
       - uses: actions/checkout@v4
