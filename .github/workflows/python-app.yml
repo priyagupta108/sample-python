@@ -3,10 +3,8 @@ name: Test Setup Python with Cache
 on:
   push:
     branches:
-      - test-1021
-  pull_request:
-    branches:
-      - main
+      - issue-1021
+ 
 
 jobs:
   Job-A:
