@@ -77,4 +77,4 @@ jobs:
       - name: Install newly added packages
         run: |
             pip install -r backend/requirements/requirements.txt
-            # pip install -r backend/requirements/dev-requirements.txt 
+            pip install -r backend/requirements/dev-requirements.txt 
