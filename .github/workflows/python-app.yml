@@ -20,24 +20,23 @@ jobs:
 
       - name: Run Mypy
         run: |
-          # pip install -r backend/requirements/linter-requirements.txt
+          pip install -r backend/requirements/linter-requirements.txt
           # mypy --config backend/mypy.ini backend
-           python -m pip install --upgrade pip
-           pip install -r requirements.txt
+         
 
 
   Job-B:
     runs-on: ubuntu-latest
-    services:
-      postgresql:
-        image: somerepo/someimage:latest
-        ports:
-          - 5432:5432
-        env:
-          SOME_VAR: SOMEVAR
-        credentials:
-          username: someuser
-          password: somepass
+    # services:
+    #   postgresql:
+    #     image: somerepo/someimage:latest
+    #     ports:
+    #       - 5432:5432
+    #     env:
+    #       SOME_VAR: SOMEVAR
+    #     credentials:
+    #       username: someuser
+    #       password: somepass
     steps:
       - name: Check out repository code 🕵🏻‍♀️
         uses: actions/checkout@v4
@@ -49,8 +48,6 @@ jobs:
 
       - name: Install newly added packages
         run: |
-          # pip install -r backend/requirements/requirements.txt
+          pip install -r backend/requirements/requirements.txt
           # pip install -r backend/requirements/dev-requirements.txt
-           python -m pip install --upgrade pip
-           pip install -r requirements.txt
-           pip install psycopg2-binary==2.9.9
+         
