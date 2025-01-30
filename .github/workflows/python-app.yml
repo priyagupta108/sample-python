@@ -25,7 +25,6 @@ jobs:
           # mypy --config backend/mypy.ini backend
          
 
-
   Job-B:
     needs: Job-A
     runs-on: ubuntu-latest
