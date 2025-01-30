@@ -27,6 +27,7 @@ jobs:
 
 
   Job-B:
+    needs: Job-A
     runs-on: ubuntu-latest
     # services:
     #   postgresql:
