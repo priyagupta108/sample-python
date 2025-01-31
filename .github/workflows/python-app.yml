@@ -5,7 +5,6 @@ on:
     branches:
       - issue-1021
  
-
 jobs:
   Job-A:
     runs-on: ubuntu-latest
@@ -22,7 +21,7 @@ jobs:
         run: |
           pip install -r backend/requirements/linter-requirements.txt
           # mypy --config backend/mypy.ini backend
-         
+       
 
   Job-B:
     needs: Job-A
