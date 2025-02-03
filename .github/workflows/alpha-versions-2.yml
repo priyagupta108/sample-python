@@ -1,4 +1,4 @@
-name: Test x-Ranges Python Versions
+name: Test Alpha(3.14.0a4t) Python Versions
 
 on:
   push:
@@ -6,6 +6,27 @@ on:
       - python-freethreaded-test
 
 jobs:
+  # test-freethreaded:
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
+  #       python-version:
+  #         - '3.14.0-alpha.1'
+          
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #        # uses: actions/setup-python@v5
+  #       uses: priyagupta108/setup-python@test-pr-973
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+  #     - name: Install dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         pip install -r requirements.txt
+
   test-freethreaded-true:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -13,7 +34,8 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
         python-version:
-          - '3.x'
+          - '3.14.0-alpha.4'
+         
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -21,13 +43,12 @@ jobs:
         uses: priyagupta108/setup-python@test-pr-973
         with:
           python-version: ${{ matrix.python-version }}
-          check-latest: true
           freethreaded: true
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
+          pip install -r requirements.txt    
+            
   test-default:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -35,7 +56,8 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
         python-version:
-          - '3.x'
+         - '3.14.0-alpha.4'
+         
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -43,9 +65,8 @@ jobs:
         uses: priyagupta108/setup-python@test-pr-973
         with:
           python-version: ${{ matrix.python-version }}
-          check-latest: true
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-        
+          pip install -r requirements.txt    
+  

@@ -1,9 +1,11 @@
 name:  Test Python Versions Less Than 3.13
 
 on:
-  push:
-    branches:
-      - python-freethreaded-test
+  # push:
+  #   branches:
+  #     - python-freethreaded-test
+  workflow_dispatch:
+    
 
 jobs:
   test:
