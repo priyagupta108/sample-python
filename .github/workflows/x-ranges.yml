@@ -6,6 +6,29 @@ on:
       - python-freethreaded-test
 
 jobs:
+  test-with-t:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version:
+          - '3.xt'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+         # uses: actions/setup-python@v5
+        uses: priyagupta108/setup-python@test-pr-973
+        with:
+          python-version: ${{ matrix.python-version }}
+          check-latest: true
+          freethreaded: true
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+
   test-freethreaded-true:
     runs-on: ${{ matrix.os }}
     strategy:

@@ -23,6 +23,7 @@ jobs:
         uses: priyagupta108/setup-python@test-pr-973
         with:
           python-version: ${{ matrix.python-version }}
+          freethreaded: true
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
