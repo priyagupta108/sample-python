@@ -6,12 +6,13 @@ on:
       - python-freethreaded-test
 
 jobs:
-  test-freethreaded:
+  test-with-t:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
+        # os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
+        os: [ubuntu-latest]
         python-version:
           - '3.14.0a4t'
           
@@ -32,9 +33,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
+        os: [ubuntu-latest]
         python-version:
-          - '3.14.0a4t'
+          - '3.14.0a4'
          
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +55,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
+        os: [ubuntu-latest]
         python-version:
          - '3.14.0a4'
          

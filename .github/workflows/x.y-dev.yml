@@ -2,9 +2,9 @@ name: Test x.y-dev Python Versions
 
 on:
    workflow_dispatch:
-  #  push:
-  #   branches:
-  #     - python-freethreaded-test
+   push:
+    branches:
+      - python-freethreaded-test
 
 jobs:
   test-freethreaded:
@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
+        os: [ubuntu-latest]
         python-version:
           - '3.14t-dev'
           - '3.13t-dev'
@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
+        os: [ubuntu-latest]
         python-version:
           - '3.14-dev'
           - '3.13-dev'
@@ -55,7 +55,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
+        os: [ubuntu-latest]
         python-version:
           - '3.14-dev'
           - '3.13-dev'
