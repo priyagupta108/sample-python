@@ -28,7 +28,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-  test-default:
+  test-default-pr:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -48,4 +48,25 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-        
+
+  test-default-v5:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version:
+          - '3.x'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        # uses: priyagupta108/setup-python@test-pr-973
+        with:
+          python-version: ${{ matrix.python-version }}
+          check-latest: true
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+           
