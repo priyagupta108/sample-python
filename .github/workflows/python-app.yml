@@ -10,6 +10,7 @@ jobs:
   
     - name: Verify PATH
       run: echo $PATH
+      
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
