@@ -21,8 +21,8 @@ jobs:
     - name: Clean PATH
       run: |
         $cleanedPath = ($env:PATH -split ';' | Where-Object { Test-Path $_ }) -join ';'
-        echo $cleanedPath | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
         echo "Cleaned PATH: $cleanedPath"
+        echo $cleanedPath >> $env:GITHUB_PATH
 
     - name: Verify Invalid Path Removed
       run: echo $env:PATH
