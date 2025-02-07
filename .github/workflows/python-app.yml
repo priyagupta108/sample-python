@@ -8,27 +8,24 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v2
 
     - name: Add Invalid Path
       run: |
-        echo "D:\InvalidPath" | Out-File -FilePath $env:$GITHUB_ENV -Encoding utf8 -Append
-        echo "Updated PATH: $env:PATH"
+        echo "D:\InvalidPath" >> $GITHUB_ENV
+        echo "Updated PATH: $PATH"
 
     - name: Verify Invalid Path Added
-      run: echo $env:PATH
+      run: echo $PATH
 
     - name: Clean PATH
       run: |
-        $cleanedPath = ($env:PATH -split ';' | Where-Object { Test-Path $_ }) -join ';'
+        cleanedPath = ($env:PATH -split ';' | Where-Object { Test-Path $_ }) -join ';'
+        echo "PATH=$cleanedPath" >> $GITHUB_ENV
         echo "Cleaned PATH: $cleanedPath"
-        echo $cleanedPath >> $env:$GITHUB_ENV
-     
-
-        
 
     - name: Verify Invalid Path Removed
-      run: echo $env:PATH
+      run: echo $PATH
 
     - name: Set up Python
       uses: actions/setup-python@v5
