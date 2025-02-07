@@ -12,24 +12,20 @@ jobs:
 
     - name: Add Invalid Path
       run: |
-        echo "D:\InvalidPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "D:\InvalidPath" >> $env:GITHUB_PATH
         echo "Updated PATH: $env:PATH"
-      shell: pwsh
 
     - name: Verify Invalid Path Added
       run: echo $env:PATH
-      shell: pwsh
 
     - name: Clean PATH
       run: |
         $env:PATH = ($env:PATH -split ';' | Where-Object { Test-Path $_ }) -join ';'
         echo "Cleaned PATH: $env:PATH"
-        echo $env:PATH | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      shell: pwsh
+        echo $env:PATH >> $env:GITHUB_PATH
 
     - name: Verify Invalid Path Removed
       run: echo $env:PATH
-      shell: pwsh
 
     - name: Set up Python
       uses: actions/setup-python@v5
