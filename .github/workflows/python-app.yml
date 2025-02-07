@@ -20,17 +20,20 @@ jobs:
       run: |
         echo "Verify invalid path"
         echo $env:PATH
+      shell: pwsh
 
     - name: Clean PATH
       run: |
         echo "Cleaning PATH"
         $env:PATH = ($env:PATH -split ';' | Where-Object { Test-Path $_ }) -join ';'
         echo "Cleaned PATH: $env:PATH"
+      shell: pwsh
 
     - name: Verify Invalid Path Removed
       run: |
         echo "Verify cleaned path"
         echo $env:PATH
+      shell: pwsh
 
     - name: Set up Python
       uses: actions/setup-python@v5
