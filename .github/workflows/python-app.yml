@@ -23,6 +23,9 @@ jobs:
         $cleanedPath = ($env:PATH -split ';' | Where-Object { Test-Path $_ }) -join ';'
         echo "Cleaned PATH: $cleanedPath"
         echo $cleanedPath >> $env:GITHUB_PATH
+      shell: pwsh   
+
+        
 
     - name: Verify Invalid Path Removed
       run: echo $env:PATH
