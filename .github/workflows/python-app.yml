@@ -1,19 +1,41 @@
-name: Test Non-Existent Path
+name: Test Invalid Path
 
 on: [push]
 
 jobs:
-  build:
-    runs-on: self-hosted
+  test-invalid-path:
+    runs-on: windows-latest
+
     steps:
-  
-    - name: Verify PATH
-      run: echo $PATH
-      
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Add Invalid Path
+      run: |
+        echo "Adding invalid path"
+        $env:PATH = "D:\InvalidPath;" + $env:PATH
+        echo "Updated PATH: $env:PATH"
+
+    - name: Verify Invalid Path Added
+      run: |
+        echo "Verify invalid path"
+        echo $env:PATH
+
+    - name: Clean PATH
+      run: |
+        echo "Cleaning PATH"
+        $env:PATH = ($env:PATH -split ';' | Where-Object { Test-Path $_ }) -join ';'
+        echo "Cleaned PATH: $env:PATH"
+
+    - name: Verify Invalid Path Removed
+      run: |
+        echo "Verify cleaned path"
+        echo $env:PATH
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10.1'
+        python-version: '3.10'
 
-    - name: Verify PATH
-      run: echo $PATH
+    - name: Verify Python Installation
+      run: python --version
