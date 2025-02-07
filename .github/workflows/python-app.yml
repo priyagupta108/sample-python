@@ -23,7 +23,7 @@ jobs:
         $cleanedPath = ($env:PATH -split ';' | Where-Object { Test-Path $_ }) -join ';'
         echo "Cleaned PATH: $cleanedPath"
         echo $cleanedPath >> $env:$GITHUB_ENV
-      shell: pwsh   
+     
 
         
 
