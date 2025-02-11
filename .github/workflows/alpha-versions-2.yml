@@ -7,26 +7,27 @@ on:
       
 
 jobs:
-  # test-freethreaded:
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
-  #       python-version:
-  #         - '3.14.0-alpha.1'
+  test-freethreaded:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
+        python-version:
+          - '3.14.0t-alpha.4'
+          - '3.14t-alpha'
           
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Set up Python ${{ matrix.python-version }}
-  #        # uses: actions/setup-python@v5
-  #       uses: priyagupta108/setup-python@test-pr-973
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install -r requirements.txt
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+         # uses: actions/setup-python@v5
+        uses: priyagupta108/setup-python@test-pr-973
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
   test-freethreaded-true:
     runs-on: ${{ matrix.os }}
@@ -35,7 +36,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version:
-          - '3.14.0t-alpha.4'
+          - '3.14.0-alpha.4'
          
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +45,7 @@ jobs:
         uses: priyagupta108/setup-python@test-pr-973
         with:
           python-version: ${{ matrix.python-version }}
-          # freethreaded: true
+          freethreaded: true
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
