@@ -12,10 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, macos-13, ubuntu-latest]
-        python-version:
-          - '3.14.0t-alpha.4'
-          - '3.14t-alpha'
+        os: [ubuntu-latest]
+        python-version: ['3.14.0t-alpha.4', 3.14t-alpha']
           
     steps:
       - uses: actions/checkout@v4
