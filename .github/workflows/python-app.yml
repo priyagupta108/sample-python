@@ -15,7 +15,7 @@ jobs:
     - name: Set up Python ${{ matrix.python-version }}
       # uses: actions/setup-python@v4
       # uses: priya-kinthali/setup-python@freethread-pr-319
-    - uses: astral-sh/setup-uv@5
+      uses: astral-sh/setup-uv@5
       with:
           python-version: ${{ matrix.python-version }}
   
