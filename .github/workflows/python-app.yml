@@ -1,52 +1,28 @@
-name: Test Setup Python with Cache
+name: Test Python Versions
 
-on:
-  push:
-    branches:
-      - test-pr-896
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
+  test:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.12.3"]
-        cache: [pip, poetry, pipenv]
-
+        python-version: ['3.13', '3.13t']
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Poetry
-      if: matrix.cache == 'poetry'
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH   
-
-    - name: Setup Python
-      uses: priyagupta108/setup-python@upgrade-cache-4.0.0
+    - name: Set up Python ${{ matrix.python-version }}
+      # uses: actions/setup-python@v4
+      uses: priya-kinthali/setup-python@freethread-pr-319
       with:
         python-version: ${{ matrix.python-version }}
-        cache: ${{ matrix.cache }}
 
-    - name: Cache dependencies with pip
-      if: matrix.cache == 'pip'
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: poetry install
-      if: matrix.cache == 'poetry'
+    - name: Run tests
       run: |
-        poetry install
-
-    - name: Cache dependencies with Pipenv
-      if: matrix.cache == 'pipenv'
-      run: |
-        pip install --upgrade pip
-        pip install pipenv
-        pipenv install
+        python test_script.py
