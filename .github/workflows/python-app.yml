@@ -12,12 +12,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      # uses: actions/setup-python@v4
-      # uses: priya-kinthali/setup-python@freethread-pr-319
-      uses: astral-sh/setup-uv@5
-      with:
-          python-version: ${{ matrix.python-version }}
+    # - name: Set up Python ${{ matrix.python-version }}
+    #   # uses: actions/setup-python@v4
+    #   # uses: priya-kinthali/setup-python@freethread-pr-319
+    #   uses: as
+    #   with:
+    #       python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
   
         
 
