@@ -1,5 +1,4 @@
 name: Test Python Versions
-
 on: [push, pull_request]
 
 jobs:
