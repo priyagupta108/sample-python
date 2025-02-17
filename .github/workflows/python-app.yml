@@ -16,7 +16,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
+    - name: Show pip cache directory
+      run: |
+        pip cache dir
     - name: Set up Python ${{ matrix.python-version }}
       # uses: actions/setup-python@v2.3.1
       uses: priyagupta108/setup-python@issue-1034
