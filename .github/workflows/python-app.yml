@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: Windows-latest
+    runs-on: Ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
