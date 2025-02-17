@@ -9,16 +9,16 @@ jobs:
       matrix:
         python-version: ['3.13.1', '3.12.8', '3.9', '3.10', '3.11', '3.8']
 
-    # env:
-    #   PIP_NO_PYTHON_VERSION_WARNING: 1
+    env:
+      PIP_NO_PYTHON_VERSION_WARNING: 1
        
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2.3.1
-      # uses: priyagupta108/setup-python@issue-1034
+      # uses: actions/setup-python@v2.3.1
+      uses: priyagupta108/setup-python@issue-1034
       with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
