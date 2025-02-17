@@ -11,8 +11,8 @@ jobs:
 
     env:
       PIP_DISABLE_PIP_VERSION_CHECK: 1
-      # PIP_NO_PYTHON_VERSION_WARNING: 1
-      PIP_NO_WARN_SCRIPT_LOCATION: 1
+      PIP_NO_PYTHON_VERSION_WARNING: 1
+      # PIP_NO_WARN_SCRIPT_LOCATION: 1
       PY_COLORS: 1    
     steps:
     - name: Checkout repository
