@@ -24,8 +24,8 @@ jobs:
       run: |
         pip cache dir
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      # uses: priyagupta108/setup-python@issue-1034
+      # uses: actions/setup-python@v5
+      uses: priyagupta108/setup-python@issue-1034
       with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
