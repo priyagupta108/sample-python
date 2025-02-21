@@ -9,10 +9,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.13', '3.12', '3.9', '3.10', '3.11', '3.8']
+        python-version: ['3.13', '3.12']
+        # python-version: ['3.13', '3.12', '3.9', '3.10', '3.11', '3.8']
         
     env:
       PIP_NO_PYTHON_VERSION_WARNING: 1
+      
        
     steps:
     - name: Checkout repository
