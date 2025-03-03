@@ -15,7 +15,7 @@ jobs:
       
       uses: priyagupta108/setup-python@test-pr-973
       with:
-          python-version: 3.13.2
+          python-version: 3.12.3
           # architecture: 'arm64'
           
         
