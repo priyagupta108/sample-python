@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   test:
   
-    runs-on: ARM64
+    runs-on:  self-hosted
   
     steps:
     - name: Checkout repository
