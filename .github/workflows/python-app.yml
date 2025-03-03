@@ -15,8 +15,9 @@ jobs:
       uses: actions/setup-python@v5
       # uses: priyagupta108/setup-python@test-pr-973
       with:
-          python-version: 3.13.1
+          python-version: 3.13.2
           # architecture: 'arm64'
+          
         
 
     - name: Install dependencies
