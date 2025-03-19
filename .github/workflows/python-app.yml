@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on:  X64
+    runs-on:  Ubuntu-latest
     
   
     steps:
@@ -14,9 +14,10 @@ jobs:
     - name: Set up Python ${{ matrix.python-version }}
       # uses: actions/setup-python@v5
     
-      uses: priyagupta108/setup-python@test-pr-973
+      uses: priya-kinthali/setup-python@update-e2e-freethread
       with:
           python-version: 3.12.3
+          cache: pip
           # architecture: 'arm64'
           
         
