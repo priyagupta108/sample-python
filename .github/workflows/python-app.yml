@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest, macos-13]
-        python-version: ['3.13.1', '3.12.1']
+        python-version: ['3.13.1', '3.12']
 
   
     steps:
