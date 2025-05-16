@@ -21,7 +21,7 @@ jobs:
       uses: gowridurgad/setup-python@pip-version
       with:
           python-version: ${{ matrix.python-version }}
-          pip-version: 24.2.6.8
+          pip-version: 24.2
           
     - name: Verify pip version
       run: |
