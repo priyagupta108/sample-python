@@ -20,7 +20,7 @@ jobs:
       uses: priyagupta108/setup-python@test-pip-version
       with:
           python-version: ${{ matrix.python-version }}
-          pip-version: 'latest'
+          pip-version: 24.2
           
     - name: Verify pip version
       run: |
