@@ -3,7 +3,6 @@ name: Test Python Versions
 on: [push, pull_request]
 
 jobs:
-
   test:
     runs-on: ${{ matrix.os }}
     strategy:
