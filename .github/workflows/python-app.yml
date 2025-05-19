@@ -18,8 +18,8 @@ jobs:
 
     - name: Set up Python ${{ matrix.python-version }}
       # uses: actions/setup-python@v5
-      # uses: priyagupta108/setup-python@test-pip-version
-      uses: gowridurgad/setup-python@pip-version
+      uses: priyagupta108/setup-python@test-pip-version
+      # uses: gowridurgad/setup-python@pip-version
       with:
           python-version: ${{ matrix.python-version }}
           pip-version: 24.2
