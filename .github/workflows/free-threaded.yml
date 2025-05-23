@@ -1,0 +1,31 @@
+name: Test Python free-threaded
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest, macos-13]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: priyagupta108/setup-python@test-pip-version
+        with:
+          python-version: '3.13t'
+          pip-version: 24.1
+          cache: 'pip'
+
+      - name: Verify pip version
+        run: python -m pip --version
+
+      - run: pip install -r requirements.txt    
+
+     
+
+

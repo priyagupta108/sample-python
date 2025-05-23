@@ -1,15 +1,15 @@
-name: Test Python Versions
+name: Test prerelease Python 
 
 on: [push, pull_request]
 
 jobs:
-  test-changes:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        python-version: ['3.14.0-beta.1', '3.14.0-alpha.1', "3.13.0-rc.3"]
         os: [windows-latest, ubuntu-latest, macos-latest, macos-13]
-        python-version: ['3.13.1', '3.12']
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -17,13 +17,15 @@ jobs:
       - name: Set up Python
         uses: priyagupta108/setup-python@test-pip-version
         with:
-          python-version: ${{ matrix.python-version }}
-          pip-version: 23.1
+          python-version: ${{ matrix.python-version}}
+          pip-version: 24.1
           cache: 'pip'
-
-      - run: pip install -r requirements.txt    
 
       - name: Verify pip version
         run: python -m pip --version
+
+      - run: pip install -r requirements.txt    
+
+     
 
 

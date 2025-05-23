@@ -1,0 +1,50 @@
+name: Test Python Versions
+
+on: [push, pull_request]
+
+jobs:
+  test-cached-versions:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest, macos-13]
+        python-version: ['3.13', '3.12', '3.11', '3.10', 3.9']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: priyagupta108/setup-python@test-pip-version
+        with:
+          python-version: ${{ matrix.python-version }}
+          pip-version: 23.1
+      - name: Verify pip version
+        run: python -m pip --version
+
+      - run: pip install -r requirements.txt    
+
+     
+
+
+  test-noncached-versions:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest, macos-13]
+        python-version: ['3.13.2', '3.11.2', '3.9.10', '3.10.4', 3.12.2']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: priyagupta108/setup-python@test-pip-version
+        with:
+          python-version: ${{ matrix.python-version }}
+          pip-version: 23.1
+
+      - name: Verify pip version
+        run: python -m pip --version
+
+      - run: pip install -r requirements.txt  
