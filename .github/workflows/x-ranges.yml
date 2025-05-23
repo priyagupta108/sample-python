@@ -3,7 +3,6 @@ name: Test x-Ranges Python Versions
 on:
   push:
 
-
 jobs:
   test:
     runs-on: ${{ matrix.os }}
