@@ -1,0 +1,32 @@
+name: Test prerelease pip
+
+on: [push, pull_request]
+
+jobs:
+  test-cache:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest, macos-13, ubuntu-24.04-arm, windows-11-arm]
+        python-version: ['3.13.3', '3.12']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: priyagupta108/setup-python@test-pip-version
+        with:
+          python-version: ${{ matrix.python-version }}
+          pip-version: 24.1b2
+          cache: 'pip'
+
+      - name: Verify pip version
+        run: python -m pip --version
+
+      - run: pip install -r requirements.txt    
+
+     
+
+
