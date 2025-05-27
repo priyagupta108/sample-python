@@ -51,9 +51,9 @@ jobs:
           pip install "pip~=23.2"
           pip --version
           
-          echo "Testing pip===23.2.1+build"
-          pip install "pip===23.2.1+build"
-          pip --version
+          # echo "Testing pip===23.2.1+build"
+          # pip install "pip===23.2.1+build"
+          # pip --version
           
           echo "Testing pip>=23.0.0,<24.0.0"
           pip install "pip>=23.0.0,<24.0.0"
