@@ -1,4 +1,4 @@
-name: Test prerelease pip
+name: Test cache-dependency-path
 
 on: [push, pull_request]
 
@@ -19,11 +19,12 @@ jobs:
         uses: priyagupta108/setup-python@test-pip-version
         with:
           python-version: ${{ matrix.python-version }}
-          pip-version: 24.1b2
           cache: 'pip'
+          pip-version: '24'
+          cache-dependency-path: '**/requirements.txt'
 
       - name: Verify pip version
-        run: python -m pip --version
+        run: pip --version
 
       - run: pip install -r requirements.txt    
 

@@ -1,16 +1,16 @@
-name: Test Python Versions
+name: Test python-version-file
 
 on: [push, pull_request]
 
 jobs:
-
-  test-noncached-versions:
+  test-cache:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest, macos-13]
-        python-version: ['3.13.2', '3.11.2', '3.9.10', '3.10.4', 3.12.2']
+        os: [windows-latest, ubuntu-latest, macos-latest, macos-13, ubuntu-24.04-arm, windows-11-arm]
+  
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -18,10 +18,16 @@ jobs:
       - name: Set up Python
         uses: priyagupta108/setup-python@test-pip-version
         with:
-          python-version: ${{ matrix.python-version }}
-          pip-version: 23.1
+          python-version-file : '.python-version'
+          cache: 'pip'
+          pip-version: '24'
+        
 
       - name: Verify pip version
         run: pip --version
 
-      - run: pip install -r requirements.txt  
+      - run: pip install -r requirements.txt    
+
+     
+
+

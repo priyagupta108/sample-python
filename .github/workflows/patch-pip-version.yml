@@ -1,4 +1,4 @@
-name: Test pip invaild version 
+name: Test patch pip Versions
 
 on: [push, pull_request]
 
@@ -19,11 +19,11 @@ jobs:
         uses: priyagupta108/setup-python@test-pip-version
         with:
           python-version: ${{ matrix.python-version }}
-          pip-version: 24.3.2
+          pip-version: 24.3.1
           cache: 'pip'
 
       - name: Verify pip version
-        run: python -m pip --version
+        run: pip --version
 
       - run: pip install -r requirements.txt    
 

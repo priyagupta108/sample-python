@@ -22,7 +22,7 @@ jobs:
           cache: 'pip'
 
       - name: Verify pip version
-        run: python -m pip --version
+        run: pip --version
 
       - run: pip install -r requirements.txt    
 
