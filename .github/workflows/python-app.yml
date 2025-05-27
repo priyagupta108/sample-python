@@ -24,41 +24,41 @@ jobs:
           set -e
 
           echo "Testing pip==23.2.1"
-          pip install "pip==23.2.1"
+          pip install --upgrade "pip==23.2.1"
           pip --version
 
           echo "Testing pip!=23.1.0"
-          pip install "pip!=23.1.0"
+          pip install --upgrade "pip!=23.1.0"
           pip --version
 
           echo "Testing pip>23.0.0"
-          pip install "pip>23.0.0"
+          pip install --upgrade "pip>23.0.0"
           pip --version
 
           echo "Testing pip<24.0.0"
-          pip install "pip<24.0.0"
+          pip install --upgrade "pip<24.0.0"
           pip --version
           
           echo "Testing pip>=23.0.0"
-          pip install "pip>=23.0.0"
+          pip install --upgrade "pip>=23.0.0"
           pip --version
 
           echo "Testing pip<=23.3.1"
-          pip install "pip<=23.3.1"
+          pip install --upgrade "pip<=23.3.1"
           pip --version
 
           echo "Testing pip~=23.2"
-          pip install "pip~=23.2"
+          pip install --upgrade "pip~=23.2"
           pip --version
           
           # echo "Testing pip===23.2.1+build"
-          # pip install "pip===23.2.1+build"
+          # pip install --upgrade "pip===23.2.1+build"
           # pip --version
           
           echo "Testing pip>=23.0.0,<24.0.0"
-          pip install "pip>=23.0.0,<24.0.0"
+          pip install --upgrade "pip>=23.0.0,<24.0.0"
           pip --version
           
           echo "Testing pip>=23.0.0,!=23.1.0"
-          pip install "pip>=23.0.0,!=23.1.0"
+          pip install --upgrade "pip>=23.0.0,!=23.1.0"
           pip --version
