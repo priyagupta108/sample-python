@@ -1,23 +1,45 @@
-name: Test Windows ARM Setup-node issue#1121
+name: Test pip Version Specifiers
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - unzip-issue
-  
-jobs:
-  build:
-    runs-on: [self-hosted, ARM64]
-    # runs-on: windows-latest
+    paths:
+      - ".github/workflows/test-pip-versions.yml"
 
+jobs:
+  test-pip-versions:
+    runs-on: ubuntu-latest
+   
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: priyagupta108/setup-node@fix-win-arm64-setup
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
-          node-version: '22.7.0'
+          python-version: 3.12
 
-      - name: Display Node.js version
-        run: node -v
+      - name: Test pip version specifiers
+        shell: bash
+        run: |
+          set -e
+
+          echo "Testing pip==23.2.1"
+          pip install --upgrade pip==23.2.1
+          pip --version
+
+          echo "Testing pip>=23.0.0,<24.0.0"
+          pip install --upgrade "pip>=23.0.0,<24.0.0"
+          pip --version
+
+          echo "Testing pip>=23.2.0,<23.3.0"
+          pip install --upgrade "pip>=23.2.0,<23.3.0"
+          pip --version
+
+          echo "Testing pip<23.4.0"
+          pip install --upgrade "pip<23.4.0"
+          pip --version
+
+          echo "Testing pip>=23.0.0,!=23.1.0"
+          pip install --upgrade "pip>=23.0.0,!=23.1.0"
+          pip --version
