@@ -3,8 +3,7 @@ name: Test pip Version Specifiers
 on:
   workflow_dispatch:
   push:
-    paths:
-      - ".github/workflows/test-pip-versions.yml"
+   
 
 jobs:
   test-pip-versions:
