@@ -1,0 +1,28 @@
+name: Test already Installed pip Version
+
+on: [push, pull_request]
+
+jobs:
+  test-cache:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest, macos-13, ubuntu-24.04-arm, windows-11-arm]
+  
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: priyagupta108/setup-python@test-pip-version
+        with:
+          python-version : '3.12'
+          pip-version: 25.1.1
+  
+       
+      - name: Check pip version
+        run: pip --version
+
+    
