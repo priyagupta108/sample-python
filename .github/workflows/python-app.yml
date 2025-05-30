@@ -87,7 +87,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           pip-version: 24.1
-          update-environment: false
+          # update-environment: false
 
       - name: Verify pip version
         run: pip --version
@@ -98,7 +98,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest, macos-13, ubuntu-24.04-arm, windows-11-arm]
-        python-version: ['pypy3.10', 'graalpy-24.0']
+        python-version: ['3.12.1']
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -107,7 +107,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          update-environment: false
+          # update-environment: false
 
       - name: Verify pip version
         run: pip --version
