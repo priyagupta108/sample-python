@@ -85,7 +85,7 @@ jobs:
         uses: priyagupta108/setup-python@test-pip-version
         with:
           python-version: ${{ matrix.python-version }}
-          pip-version: "~=23.2"
+          pip-version: 24.1b2
           update-environment: false
 
       - name: Verify pip version
