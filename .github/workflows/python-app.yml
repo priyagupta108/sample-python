@@ -87,7 +87,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           pip-version: 24.1
-          update-environment: false
+          # update-environment: false
 
       - name: Verify pip version
         run: pip --version
