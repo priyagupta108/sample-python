@@ -2,7 +2,7 @@ name: Test pip unsupported version format
 
 on:
   workflow_dispatch:
-  push:
+  # push:
 
 
 jobs:
