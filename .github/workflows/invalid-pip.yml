@@ -3,7 +3,7 @@ name: Test pip invalid version
 on: [push, pull_request]
 
 jobs:
-  test-cache:
+  test-invalid-pip:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: priyagupta108/setup-python@test-pip-version
+        uses: priyagupta108/setup-python@pip-version-input
         with:
           python-version: '3.12'
           pip-version: 24.3.2

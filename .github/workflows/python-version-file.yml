@@ -3,7 +3,7 @@ name: Test python-version-file
 on: [push, pull_request]
 
 jobs:
-  test-cache:
+  test-python-version-file:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: priyagupta108/setup-python@test-pip-version
+        uses: priyagupta108/setup-python@pip-version-input
         with:
           python-version-file : '.python-version'
           cache: 'pip'

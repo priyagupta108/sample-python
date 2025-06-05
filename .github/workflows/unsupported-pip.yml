@@ -1,0 +1,133 @@
+name: Test pip unsupported version format
+
+on: [push, pull_request]
+
+jobs:
+  test-!=23.1.0:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: priyagupta108/setup-python@pip-version-input
+        with:
+          python-version: '3.12'
+          pip-version: '!=23.1.0'
+          cache: 'pip'
+
+      - name: Verify pip version
+        run: pip --version
+
+      - run: pip install -r requirements.txt    
+
+    test->23.0.0:
+      runs-on: ubuntu-latest
+    
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Set up Python
+          uses: priyagupta108/setup-python@pip-version-input
+          with:
+            python-version: '3.12'
+            pip-version: '>23.0.0'
+            cache: 'pip'
+
+        - name: Verify pip version
+          run: pip --version
+
+        - run: pip install -r requirements.txt    
+
+test-<24.0.0:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: priyagupta108/setup-python@pip-version-input
+        with:
+          python-version: '3.12'
+          pip-version: '<24.0.0'
+          cache: 'pip'
+
+      - name: Verify pip version
+        run: pip --version
+
+      - run: pip install -r requirements.txt    
+test->=23.0.0:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: priyagupta108/setup-python@pip-version-input
+        with:
+          python-version: '3.12'
+          pip-version: '>=23.0.0'
+          cache: 'pip'
+
+      - name: Verify pip version
+        run: pip --version
+
+      - run: pip install -r requirements.txt    
+test-<=23.3.1:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: priyagupta108/setup-python@pip-version-input
+        with:
+          python-version: '3.12'
+          pip-version: '<=23.3.1'
+          cache: 'pip'
+
+      - name: Verify pip version
+        run: pip --version
+
+      - run: pip install -r requirements.txt    
+test->=23.0.0,<24.0.0:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: priyagupta108/setup-python@pip-version-input
+        with:
+          python-version: '3.12'
+          pip-version: '>=23.0.0,<24.0.0'
+          cache: 'pip'
+
+      - name: Verify pip version
+        run: pip --version
+
+      - run: pip install -r requirements.txt    
+test->=23.0.0,!=23.1.0:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: priyagupta108/setup-python@pip-version-input
+        with:
+          python-version: '3.12'
+          pip-version: '>=23.0.0,!=23.1.0'
+          cache: 'pip'
+
+      - name: Verify pip version
+        run: pip --version
+
+      - run: pip install -r requirements.txt    

@@ -20,13 +20,36 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           pip-version: 24.1
-          cache: 'pip'
+          update-environment: false
 
       - name: Verify pip version
         run: pip --version
 
       - run: pip install -r requirements.txt    
 
-     
+  test-v5:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest, macos-13, ubuntu-24.04-arm, windows-11-arm]
+        python-version: ['3.13.2', '3.12', '3.13t']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          pip-version: 24.1
+          update-environment: false
+
+      - name: Verify pip version
+        run: pip --version
+
+      - run: pip install -r requirements.txt    
+   
 
 
