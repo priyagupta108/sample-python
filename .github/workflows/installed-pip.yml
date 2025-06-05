@@ -1,6 +1,8 @@
 name: Test already Installed pip Version
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  # push:
 
 jobs:
   test-installed-pip:

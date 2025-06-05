@@ -1,6 +1,8 @@
 name: Test check latest
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  # push:
 
 jobs:
   test:

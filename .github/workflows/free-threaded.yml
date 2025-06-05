@@ -1,6 +1,8 @@
 name: Test Python free-threaded
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  # push:
 
 jobs:
   test:

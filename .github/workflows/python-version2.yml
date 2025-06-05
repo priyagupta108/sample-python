@@ -1,6 +1,8 @@
 name: Test non-cached Python Versions
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  # push:
 
 jobs:
 

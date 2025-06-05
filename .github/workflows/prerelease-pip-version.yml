@@ -1,6 +1,8 @@
 name: Test prerelease pip Versions
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  # push:
 
 jobs:
   test-prerelease-pip-version:

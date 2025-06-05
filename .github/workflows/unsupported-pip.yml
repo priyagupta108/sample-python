@@ -1,11 +1,13 @@
 name: Test pip unsupported version format
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  push:
+
 
 jobs:
-  test-1:
+  test-value1:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -20,30 +22,28 @@ jobs:
       - name: Verify pip version
         run: pip --version
 
-      - run: pip install -r requirements.txt    
+      - run: pip install -r requirements.txt
 
-    test-2:
-      runs-on: ubuntu-latest
-    
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@v4
-
-        - name: Set up Python
-          uses: priyagupta108/setup-python@pip-version-input
-          with:
-            python-version: '3.12'
-            pip-version: '>23.0.0'
-            cache: 'pip'
-
-        - name: Verify pip version
-          run: pip --version
-
-        - run: pip install -r requirements.txt    
-
-test-3:
+  test-value2:
     runs-on: ubuntu-latest
-    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: priyagupta108/setup-python@pip-version-input
+        with:
+          python-version: '3.12'
+          pip-version: '>23.0.0'
+          cache: 'pip'
+
+      - name: Verify pip version
+        run: pip --version
+
+      - run: pip install -r requirements.txt
+
+  test-value3:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,10 +58,10 @@ test-3:
       - name: Verify pip version
         run: pip --version
 
-      - run: pip install -r requirements.txt    
-test-4:
+      - run: pip install -r requirements.txt
+
+  test-value4:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -76,10 +76,10 @@ test-4:
       - name: Verify pip version
         run: pip --version
 
-      - run: pip install -r requirements.txt    
-test-5:
+      - run: pip install -r requirements.txt
+
+  test-value5:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -94,10 +94,10 @@ test-5:
       - name: Verify pip version
         run: pip --version
 
-      - run: pip install -r requirements.txt    
-test-6:
+      - run: pip install -r requirements.txt
+
+  test-value6:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -112,10 +112,10 @@ test-6:
       - name: Verify pip version
         run: pip --version
 
-      - run: pip install -r requirements.txt    
-test-7:
+      - run: pip install -r requirements.txt
+
+  test-value7:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -130,4 +130,4 @@ test-7:
       - name: Verify pip version
         run: pip --version
 
-      - run: pip install -r requirements.txt    
+      - run: pip install -r requirements.txt

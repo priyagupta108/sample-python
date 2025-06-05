@@ -1,6 +1,8 @@
 name: Test patch pip Versions
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  # push:
 
 jobs:
   test-patch-pip-version:

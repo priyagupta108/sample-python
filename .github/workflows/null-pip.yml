@@ -1,6 +1,8 @@
 name: Test pip empty value 
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  # push:
 
 jobs:
   test-empty-pip:
