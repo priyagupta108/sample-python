@@ -107,7 +107,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           freethreaded: true
-          architecture: 'x86'
+          architecture: 'x86-freethreaded'
           # update-environment: false
 
       - name: Verify pip version
