@@ -134,6 +134,13 @@ jobs:
       - name: Setup Python 
         uses: actions/setup-python@v5
         with:
-          python-version: 3.13.2t
+          # python-version: |
+          #   3.13.1t
+          #   3.13.2t
+          #   3.14t-dev
+          python-version: |
+            3.13.1
+            3.13.2
+            3.14-dev
       - name: Check Python version
         run: python3 --version  
