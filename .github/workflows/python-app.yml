@@ -124,29 +124,19 @@ on:
    
 jobs:
   test:
-    runs-on: self-hosted
+    runs-on:  windows-11-arm
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Print macOS and Architecture Info
-        run: |
-          echo "Runner Architecture: $(uname -m)"
-          echo "CPU Info: $(sysctl -n machdep.cpu.brand_string 2>/dev/null || echo 'Not available on Apple Silicon (arm64)')"
-          echo "macOS Version:"
-          sw_vers
-      - name: Check if Rosetta is installed
-        run: |
-          if pkgutil --pkg-info com.apple.pkg.RosettaUpdateAuto >/dev/null 2>&1; then
-            echo "Rosetta is installed"
-            pkgutil --pkg-info com.apple.pkg.RosettaUpdateAuto
-          else
-            echo "Rosetta is NOT installed"
-          fi
+      
       - name: Setup Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
-          architecture: 'arm64'
+          python-version: |
+            3.13.1t
+            3.13.2t
+            3.14t-dev
       - name: Check Python version
         run: python3 --version  
