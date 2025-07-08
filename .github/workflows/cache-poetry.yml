@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest, macos-13, ubuntu-24.04-arm, windows-11-arm]
+        os: [windows-latest, ubuntu-latest, macos-latest, macos-13, ubuntu-24.04-arm]
     
 
     steps:
@@ -21,13 +21,17 @@ jobs:
         run: pipx install poetry  
 
       - name: Set up Python
+        id: python
         uses: cdce8p/setup-python@pypy-version-output
         with:
           python-version: "pypy3.10"
           cache: 'poetry'
 
+      - run: echo "${{ steps.python.outputs.python-version }}"
+
       - run: pip install poetry  
 
      
-
+      - name: Install dependencies
+        run: poetry install 
 
