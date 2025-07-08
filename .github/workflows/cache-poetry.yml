@@ -21,14 +21,10 @@ jobs:
         run: pipx install poetry  
 
       - name: Set up Python
-        uses: priyagupta108/setup-python@pip-version-input
+        uses: cdce8p/setup-python@pypy-version-output
         with:
-          python-version: 3.12
-          pip-version: 24.1
+          python-version: "pypy3.10"
           cache: 'poetry'
-
-      - name: Verify pip version
-        run: pip --version
 
       - run: pip install poetry  
 
