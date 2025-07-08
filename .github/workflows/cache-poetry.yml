@@ -33,5 +33,5 @@ jobs:
 
      
       - name: Install dependencies
-        run: poetry install 
+        run: poetry install --no-root
 
