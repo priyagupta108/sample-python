@@ -19,7 +19,7 @@ jobs:
 
       - name: Set up Python
         id: python
-        uses: cdce8p/setup-python@pypy-version-output
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'

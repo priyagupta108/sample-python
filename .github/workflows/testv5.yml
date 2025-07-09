@@ -2,7 +2,7 @@ name: Test 1109 with v5
 
 on:
   workflow_dispatch:
-  push:
+  # push:
 jobs:
  tests:
     name: "Test ${{ matrix.python-version }}"
