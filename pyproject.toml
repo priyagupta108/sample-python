@@ -1,4 +1,14 @@
-
+[project]
+name = "sample-python"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Priyagupta108",email = "priyagupta108@github.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+]
 
 
 [tool.coverage.report]
