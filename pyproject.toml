@@ -1,16 +1,18 @@
-[project]
-name = "sample-python1"
-version = "0.1.0"
-description = ""
-authors = [
-    {name = "Priyagupta108",email = "priyagupta108@github.com"}
-]
-readme = "README.md"
-requires-python = ">=3.10"
-dependencies = [
-]
 
 
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.report]
+exclude_lines = [
+  "if TYPE_CHECKING:",
+  "pragma: no cover",
+  "raise NotImplementedError"
+]
+fail_under = 100
+omit = [
+  "**/tm_devices/commands/**"  # TODO: remove this exclusion
+]
+show_missing = true
+skip_empty = true
+
+[tool.poetry.dependencies]
+python = "^3.8"  # This is the main Python version requirement
