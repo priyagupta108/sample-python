@@ -2,7 +2,7 @@ name: Test check latest
 
 on:
   workflow_dispatch:
-  push:
+  # push:
 
 jobs:
   test:

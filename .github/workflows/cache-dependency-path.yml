@@ -2,7 +2,7 @@ name: Test cache-dependency-path
 
 on:
   workflow_dispatch:
-  push:
+  # push:
 jobs:
   test-cache:
     runs-on: ${{ matrix.os }}
