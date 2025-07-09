@@ -2,7 +2,7 @@ name: Test 1109 with pr
 
 on:
   workflow_dispatch:
-  push:
+  # push:
 jobs:
  tests:
     name: "Test ${{ matrix.python-version }}"
@@ -35,5 +35,5 @@ jobs:
           python -m venv venv
           . venv/bin/activate
           pip install -r requirements.txt
-          pip install . --no-deps
+          pip install .
       
