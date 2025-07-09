@@ -1,4 +1,4 @@
-name: Test 1109 with v5
+name: Test 1109 with pr
 
 on:
   workflow_dispatch:
@@ -27,13 +27,13 @@ jobs:
           path: venv
           key: >-
             ${{ runner.os }}-${{ runner.arch }}-${{ steps.python.outputs.python-version
-            }}-${{ hashFiles('pyproject.toml', 'requirements_test.txt') }}
+            }}-${{ hashFiles('pyproject.toml', 'requirements.txt') }}
       - name: Create Python venv
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
           python -m venv venv
           . venv/bin/activate
-          pip install -r requirements_test.txt
+          pip install -r requirements.txt
           pip install .
       - name: Run pytest
         run: |
