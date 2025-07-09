@@ -2,14 +2,14 @@ name: Test 1109 with pr
 
 on:
   workflow_dispatch:
-  # push:
+  push:
 jobs:
  tests:
     name: "Test ${{ matrix.python-version }}"
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["pypy-3.10", "pypy-3.11.11"]
+        python-version: ["pypy-3.10", "pypy-3.11"]
     runs-on: ubuntu-latest
     steps:
       - name: Check out code from GitHub
