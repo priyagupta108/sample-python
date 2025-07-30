@@ -19,10 +19,11 @@ jobs:
 
       - name: Set up Python
         id: python
-        uses: actions/setup-python@v5
+        uses: priyagupta108/setup-python@pip-version-input
         with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+            python-version:  '3.11'
+            pip-version: '23.2.1'
+            # update-environment: false
 
       - run: echo "${{ steps.python.outputs.python-version }}"
 
