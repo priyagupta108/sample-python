@@ -6,12 +6,8 @@ on:
 
 jobs:
   test-cache:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest, macos-13, ubuntu-24.04-arm, ]
-        python-version: ['graalpy-24.0']
+    runs-on: ubuntu-latest
+   
 
     steps:
       - name: Checkout repository
@@ -25,9 +21,19 @@ jobs:
             pip-version: '23.2.1'
             # update-environment: false
 
-      - run: echo "${{ steps.python.outputs.python-version }}"
+      - name: Check pip version
+        run: pip --version
+    
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+          
 
-      - run: pip install -r requirements.txt    
+      # - run: pip install -r requirements.txt    
 
      
 
