@@ -19,7 +19,7 @@ jobs:
         with:
             python-version:  '3.11'
             pip-version: '23.2.1'
-            # update-environment: false
+            update-environment: false
 
       - name: Check pip version
         run: pip --version
