@@ -24,7 +24,7 @@ jobs:
         id: python
         uses: actions/setup-python@v5
         with:
-          python-version: "pypy3.10"
+          python-version: "3.13"
           cache: 'poetry'
 
       - run: echo "${{ steps.python.outputs.python-version }}"
