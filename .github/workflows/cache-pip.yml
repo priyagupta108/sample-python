@@ -1,4 +1,4 @@
-name: Test pip cache
+name: Check System Architecture
 
 on:
   workflow_dispatch:
@@ -6,35 +6,16 @@ on:
 
 jobs:
   test-cache:
-    runs-on: ubuntu-latest
-   
-
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04-arm, windows-11-arm]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        id: python
-        uses: priyagupta108/setup-python@pip-version-input
-        with:
-            python-version:  '3.11'
-            pip-version: '23.2.1'
-            update-environment: false
-
-      - name: Check pip version
-        run: pip --version
-    
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-          
-
-      # - run: pip install -r requirements.txt    
-
-     
-
-
+      - name: Check System Architecture
+        shell: bash
+        run: |
+          echo "Python platform.machine(): $(python -c 'import platform; print(platform.machine())')"
+          echo "Python platform.architecture(): $(python -c 'import platform; print(platform.architecture())')"
+          echo "Python platform.processor(): $(python -c 'import platform; print(platform.processor())')"
+          echo "PowerShell \$env:PROCESSOR_ARCHITECTURE: $PROCESSOR_ARCHITECTURE"
+          echo "PowerShell \$env:PROCESSOR_IDENTIFIER: $PROCESSOR_IDENTIFIER"
