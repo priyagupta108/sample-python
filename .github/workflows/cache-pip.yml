@@ -1,25 +1,32 @@
-name: Check System Architecture
+name: Test pip cache
 
 on:
   workflow_dispatch:
   push:
 
-
 jobs:
   test-cache:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-24.04-arm, windows-11-arm, macos-latest, windows-latest]
-    steps:
-      - name: Check System Architecture
-        shell: bash
-        run: |
-          echo "Python platform.machine(): $(python -c 'import platform; print(platform.machine())')"
-          echo "Python platform.architecture(): $(python -c 'import platform; print(platform.architecture())')"
-          echo "Python platform.processor(): $(python -c 'import platform; print(platform.processor())')"
-          echo "PowerShell \$env:PROCESSOR_ARCHITECTURE: $PROCESSOR_ARCHITECTURE"
-          echo "PowerShell \$env:PROCESSOR_IDENTIFIER: $PROCESSOR_IDENTIFIER"
+        os: [windows-latest, ubuntu-latest, macos-latest, macos-13, ubuntu-24.04-arm, ]
+ 
 
-          BIRTH_NATIVE_ARCH_STRING="$(uname -m)"
-          echo "uname -m: $BIRTH_NATIVE_ARCH_STRING"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        id: python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.17"
+          cache: 'pip'
+
+      - run: echo "${{ steps.python.outputs.python-version }}"
+
+      # - run: pip install -r requirements.txt    
+
+     
+
