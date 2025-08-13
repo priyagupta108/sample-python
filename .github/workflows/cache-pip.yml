@@ -3,7 +3,7 @@ name: Test pip cache
 on:
   workflow_dispatch:
   push:
-  
+
 
 jobs:
   test-cache:
@@ -27,7 +27,7 @@ jobs:
 
       - run: echo "${{ steps.python.outputs.python-version }}"
 
-      # - run: pip install -r requirements.txt    
+      - run: pip install -r requirements.txt    
 
      
 
