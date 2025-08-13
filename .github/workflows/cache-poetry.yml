@@ -2,7 +2,7 @@ name: Test poetry cache
 
 on:
   workflow_dispatch:
-  push:
+  # push:
 
 jobs:
   test-cache:
