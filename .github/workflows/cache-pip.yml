@@ -13,11 +13,12 @@ jobs:
     steps:
       - name: Check System Architecture
         # shell: bash
+        shell: pwsh
         run: |
-          echo "Python platform.machine(): $(python -c 'import platform; print(platform.machine())')"
-          echo "Python platform.architecture(): $(python -c 'import platform; print(platform.architecture())')"
-          echo "Python platform.processor(): $(python -c 'import platform; print(platform.processor())')"
-          echo "PowerShell \$env:PROCESSOR_ARCHITECTURE: $PROCESSOR_ARCHITECTURE"
-          echo "PowerShell \$env:PROCESSOR_IDENTIFIER: $PROCESSOR_IDENTIFIER"
-          BIRTH_NATIVE_ARCH_STRING="$(uname -m)"
-          echo "uname -m: $BIRTH_NATIVE_ARCH_STRING"
+          Write-Host "Python platform.machine(): $(python -c 'import platform; print(platform.machine())')"
+          Write-Host "Python platform.architecture(): $(python -c 'import platform; print(platform.architecture())')"
+          Write-Host "Python platform.processor(): $(python -c 'import platform; print(platform.processor())')"
+          Write-Host "PowerShell \$env:PROCESSOR_ARCHITECTURE: $env:PROCESSOR_ARCHITECTURE"
+          Write-Host "PowerShell \$env:PROCESSOR_IDENTIFIER: $env:PROCESSOR_IDENTIFIER"
+          Write-Host "(Get-CimInstance Win32_Processor).Architecture: $((Get-CimInstance Win32_Processor).Architecture)"
+          Write-Host "uname -m: $(uname -m)"
