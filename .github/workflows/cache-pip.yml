@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Check System Architecture
         # shell: bash
-        shell: pwsh
+        # shell: pwsh
         run: |
           Write-Host "Python platform.machine(): $(python -c 'import platform; print(platform.machine())')"
           Write-Host "Python platform.architecture(): $(python -c 'import platform; print(platform.architecture())')"
