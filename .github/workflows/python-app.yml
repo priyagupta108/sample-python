@@ -3,7 +3,7 @@ name: Test pip cache
 on:
   push:
     branches:
-      - test-851
+      - issue-851
   workflow_dispatch:
 
 jobs:
