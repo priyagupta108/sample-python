@@ -20,8 +20,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
       - name: Set up Python
-        # uses: actions/setup-python@v5
-        uses: priyagupta108/setup-python@test-hashFiles
+        uses: actions/setup-python@v6
+        # uses: priyagupta108/setup-python@test-hashFiles
         with:
           python-version: '3.13'
           cache: 'pip'
