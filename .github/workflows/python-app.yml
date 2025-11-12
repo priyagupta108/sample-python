@@ -45,7 +45,7 @@ jobs:
       - name: Setup Python 3.13.8
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13.8'
+          python-version: '3.13.7'
           architecture: x64
           allow-prereleases: true
       
@@ -59,7 +59,7 @@ jobs:
       - name: Setup Python 3.13.8t (this should fail)
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13.8t'
+          python-version: '3.13.7t'
           architecture: x64
           allow-prereleases: true
       
