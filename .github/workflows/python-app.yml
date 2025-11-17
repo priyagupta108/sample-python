@@ -1,6 +1,8 @@
 name: Try to hit API Rate Limit with GITHUB_TOKEN
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
 
 jobs:
   rate-limit:
