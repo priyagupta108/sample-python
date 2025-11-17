@@ -2,6 +2,7 @@ name: Setup Python Rate Limit Test
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   hit-rate-limit:
