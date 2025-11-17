@@ -1,23 +1,26 @@
-name: Setup Python Rate Limit Test
+name: Try to hit API Rate Limit with GITHUB_TOKEN
 
-on:
-  workflow_dispatch:
-  push:
+on: workflow_dispatch
 
 jobs:
-  hit-rate-limit:
+  rate-limit:
     runs-on: ubuntu-latest
     steps:
-    - name: API Flood (Hit GitHub API rate limit)
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check starting rate limit
+      run: curl -H "Authorizationtoken ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/rate_limit
+
+    - name: Flood repo API (try to exhaust limit)
       run: |
-        for i in {1..2000}; do
-          curl -s -H "Authorization: token $GH_TOKEN" https://api.github.com/user > /dev/null
+        for i in {1..5000}; do
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/priyagupta108/sample-python/contents/.github/workflows > /dev/null
         done
 
-    - name: Setup Python with GraalPy
-      uses: actions/setup-python@v5
+    - name: Check rate limit after flood
+      run: curl -H "Authorizationtoken ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/rate_limit
+
+    - name: Setup Python (try to trigger rate limit error)
+      uses: actions/setup-python@v6
       with:
         python-version: graalpy-24.1
 
