@@ -2,28 +2,70 @@ name: Test
 
 on: [push, pull_request, workflow_dispatch]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref }}
+#   cancel-in-progress: true
+
+# jobs:
+#   build:
+#     runs-on: ${{ matrix.os }}
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         python-version: ["pypy3.10", "3.13"]
+#         os: [windows-latest, macos-latest, ubuntu-latest, ubuntu-22.04-arm, ubuntu-24.04-arm, macos-13]
+
+#     steps:
+#       - uses: actions/checkout@v4
+
+#       - name: Set up Python ${{ matrix.python-version }}
+#         uses: actions/setup-python@v5
+#         # uses: mayeut/setup-python@pypy-aarch64
+#         with:
+#           python-version: ${{ matrix.python-version }}
+
+#       - name: Test
+#         run: |
+#           python --version --version
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["pypy3.10", "3.13"]
-        os: [windows-latest, macos-latest, ubuntu-latest, ubuntu-22.04-arm, ubuntu-24.04-arm, macos-13]
-
+  test:
+    runs-on: ubuntu-latest
+  
     steps:
-      - uses: actions/checkout@v4
+    - name: Check out repository
+      uses: actions/checkout@v4
+    - name: Show pip version before uninstall
+      run: |
+          echo "Checking pip version before uninstall:"
+          pip3 --version || echo "pip3 not found"
+      
+    - name: Uninstall pip via apt
+      run: sudo apt-get remove python3-pip -y
+      
+    - name: Try uninstalling pip via pip (in case leftovers)
+      run: pip3 uninstall pip -y || echo "pip3 uninstall may not work if pip is removed"
+      
+    - name: Show pip version after uninstall
+      run: |
+          echo "Checking pip version after uninstall:"
+          if command -v pip3; then
+            echo "pip3 still exists!"
+            pip3 --version
+            exit 1
+          else
+            echo "pip3 successfully removed."
+          fi
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.13.9
+        cache: 'pip' 
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        # uses: mayeut/setup-python@pypy-aarch64
-        with:
-          python-version: ${{ matrix.python-version }}
+    - name: Display Python version
+      run: python --version
 
-      - name: Test
-        run: |
-          python --version --version
+    - name: Check pip
+      run: |
+        which pip
+        pip --version
