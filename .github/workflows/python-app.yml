@@ -30,7 +30,7 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   test:
-    runs-on: ns-macos-arm64
+    runs-on: self-hosted
   
     steps:
     - name: Check out repository
