@@ -30,7 +30,7 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ns-macos-arm64
   
     steps:
     - name: Check out repository
