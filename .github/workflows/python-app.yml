@@ -35,27 +35,27 @@ jobs:
     steps:
     - name: Check out repository
       uses: actions/checkout@v4
-    - name: Show pip version before uninstall
-      run: |
-          echo "Checking pip version before uninstall:"
-          pip3 --version || echo "pip3 not found"
+    # - name: Show pip version before uninstall
+    #   run: |
+    #       echo "Checking pip version before uninstall:"
+    #       pip3 --version || echo "pip3 not found"
       
-    - name: Uninstall pip via apt
-      run: sudo apt-get remove python3-pip -y
+    # - name: Uninstall pip via apt
+    #   run: sudo apt-get remove python3-pip -y
       
-    - name: Try uninstalling pip via pip (in case leftovers)
-      run: pip3 uninstall pip -y || echo "pip3 uninstall may not work if pip is removed"
+    # - name: Try uninstalling pip via pip (in case leftovers)
+    #   run: pip3 uninstall pip -y || echo "pip3 uninstall may not work if pip is removed"
       
-    - name: Show pip version after uninstall
-      run: |
-          echo "Checking pip version after uninstall:"
-          if command -v pip3; then
-            echo "pip3 still exists!"
-            pip3 --version
-            exit 1
-          else
-            echo "pip3 successfully removed."
-          fi
+    # - name: Show pip version after uninstall
+    #   run: |
+    #       echo "Checking pip version after uninstall:"
+    #       if command -v pip3; then
+    #         echo "pip3 still exists!"
+    #         pip3 --version
+    #         exit 1
+    #       else
+    #         echo "pip3 successfully removed."
+    #       fi
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
