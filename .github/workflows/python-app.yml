@@ -22,7 +22,8 @@ jobs:
         run: curl -H "Authorization token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/rate_limit
 
       - name: Setup Python (trigger rate limit error)
-        uses: actions/setup-python@v6
+        # uses: actions/setup-python@v6
+        uses: aparnajyothi-y/setup-python@ratelimit-retry-logic-graalpy
         with:
           python-version: graalpy-24.1
 
