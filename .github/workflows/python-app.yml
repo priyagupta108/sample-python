@@ -62,6 +62,7 @@ jobs:
       with:
         python-version: 3.13.9
         cache: 'pip' 
+        pip-version: '25.0.1'
 
     - name: Display Python version
       run: python --version
