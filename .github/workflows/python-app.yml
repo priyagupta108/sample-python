@@ -63,7 +63,7 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: 3.13.9
-        pip-version: '25.0.1'
+        # pip-version: '25.0.1'
         cache: 'pip' 
         
 
