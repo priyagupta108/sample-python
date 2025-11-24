@@ -37,11 +37,11 @@ jobs:
     steps:
     - name: Check out repository
       uses: actions/checkout@v4
-    - name: Fix pip entries
-      run: |
-        python3 -m pip uninstall -y pip
-        python3 -m ensurepip --upgrade
-        python3 -m pip install --upgrade pip
+    # - name: Fix pip entries
+    #   run: |
+    #     python3 -m pip uninstall -y pip
+    #     python3 -m ensurepip --upgrade
+    #     python3 -m pip install --upgrade pip
       
     # - name: Show pip version after uninstall
     #   run: |
@@ -59,7 +59,7 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: 3.13.9
-        pip-version: '25.2'
+        pip-version: '25.0.1'
         cache: 'pip' 
         
 
