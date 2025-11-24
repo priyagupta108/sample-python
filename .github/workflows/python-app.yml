@@ -59,7 +59,7 @@ jobs:
     #         echo "pip3 successfully removed."
     #       fi
     - name: Force reinstall pip
-      run: python -m pip install --force-reinstall pip
+      run: python3 -m pip install --force-reinstall pip
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
