@@ -39,9 +39,9 @@ jobs:
       uses: actions/checkout@v4
     - name: Fix pip entries
       run: |
-        python -m pip uninstall -y pip
-        python -m ensurepip --upgrade
-        python -m pip install --upgrade pip
+        python3 -m pip uninstall -y pip
+        python3 -m ensurepip --upgrade
+        python3 -m pip install --upgrade pip
       
     # - name: Show pip version after uninstall
     #   run: |
