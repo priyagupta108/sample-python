@@ -36,7 +36,7 @@ jobs:
   
     steps:
     - name: Check out repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     # - name: Fix pip entries
     #   run: |
     #     python3 -m pip uninstall -y pip
@@ -55,11 +55,15 @@ jobs:
     #       fi
     # - name: Force reinstall pip
     #   run: python3 -m ensurepip --upgrade
+    - name: Clear Python tool cache
+      run: |
+          echo "Clearing Python tool cache at $RUNNER_TOOL_CACHE..."
+          rm -rf "$RUNNER_TOOL_CACHE/Python"
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
         python-version: 3.13.9
-        pip-version: '25.0.1'
+        # pip-version: '25.0.1'
         cache: 'pip' 
         
 
