@@ -55,6 +55,9 @@ jobs:
     #       fi
     # - name: Force reinstall pip
     #   run: python3 -m ensurepip --upgrade
+
+    - name: Print tool cache directory
+      run: echo "$RUNNER_TOOL_CACHE"
     - name: Install dependencies
       run: |
           sudo rm -rf /Users/runner/hostedtoolcache/Python
