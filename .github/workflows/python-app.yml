@@ -55,8 +55,9 @@ jobs:
     #       fi
     # - name: Force reinstall pip
     #   run: python3 -m ensurepip --upgrade
-    - name: Clear Python cache with sudo
-      run: sudo rm -rf "$RUNNER_TOOL_CACHE/Python"
+    - name: Install dependencies
+      run: |
+          rm -rf /opt/hostedtoolcache/Python
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
