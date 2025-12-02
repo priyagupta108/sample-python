@@ -57,7 +57,7 @@ jobs:
     #   run: python3 -m ensurepip --upgrade
     - name: Install dependencies
       run: |
-          rm -rf $RUNNER_TOOL_CACHE/Python/3.13.9
+          sudo rm -rf /Users/runner/hostedtoolcache/Python
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
