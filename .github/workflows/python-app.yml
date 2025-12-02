@@ -32,7 +32,8 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   test:
-    runs-on: self-hosted
+    runs-on: macos-latest 
+    # runs-on: self-hosted
   
     steps:
     - name: Check out repository
@@ -58,9 +59,9 @@ jobs:
 
     - name: Print tool cache directory
       run: echo "$RUNNER_TOOL_CACHE"
-    - name: Install dependencies
-      run: |
-          sudo rm -rf /Users/runner/hostedtoolcache/Python
+    # - name: Install dependencies
+    #   run: |
+    #       sudo rm -rf /Users/runner/hostedtoolcache/Python
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
