@@ -1,1 +1,1 @@
-# sample-python
+# sample-go
