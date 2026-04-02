@@ -1,79 +1,110 @@
-name: Test
+# name: Test
 
-on: [push, pull_request, workflow_dispatch]
+# on: [push, pull_request, workflow_dispatch]
 
-# concurrency:
-#   group: ${{ github.workflow }}-${{ github.ref }}
-#   cancel-in-progress: true
+# # concurrency:
+# #   group: ${{ github.workflow }}-${{ github.ref }}
+# #   cancel-in-progress: true
+
+# # jobs:
+
+# #   build:
+# #     runs-on: ${{ matrix.os }}
+# #     strategy:
+# #       fail-fast: false
+# #       matrix:
+
+# #         python-version: ["pypy3.10", "3.13"]
+# #         os: [windows-latest, macos-latest, ubuntu-latest, ubuntu-22.04-arm, ubuntu-24.04-arm, macos-13]
+
+# #     steps:
+# #       - uses: actions/checkout@v4
+
+# #       - name: Set up Python ${{ matrix.python-version }}
+# #         uses: actions/setup-python@v5
+# #         # uses: mayeut/setup-python@pypy-aarch64
+# #         with:
+# #           python-version: ${{ matrix.python-version }}
+
+# #       - name: Test
+# #         run: |
+# #           python --version --version
 
 # jobs:
-
-#   build:
-#     runs-on: ${{ matrix.os }}
-#     strategy:
-#       fail-fast: false
-#       matrix:
-
-#         python-version: ["pypy3.10", "3.13"]
-#         os: [windows-latest, macos-latest, ubuntu-latest, ubuntu-22.04-arm, ubuntu-24.04-arm, macos-13]
-
-#     steps:
-#       - uses: actions/checkout@v4
-
-#       - name: Set up Python ${{ matrix.python-version }}
-#         uses: actions/setup-python@v5
-#         # uses: mayeut/setup-python@pypy-aarch64
-#         with:
-#           python-version: ${{ matrix.python-version }}
-
-#       - name: Test
-#         run: |
-#           python --version --version
-
-jobs:
-  test:
-    runs-on: macos-latest 
-    # runs-on: self-hosted
+#   test:
+#     runs-on: macos-latest 
+#     # runs-on: self-hosted
   
-    steps:
-    - name: Check out repository
-      uses: actions/checkout@v6
-    # - name: Fix pip entries
-    #   run: |
-    #     python3 -m pip uninstall -y pip
-    #     python3 -m ensurepip --upgrade
-    #     python3 -m pip install --upgrade pip
+#     steps:
+#     - name: Check out repository
+#       uses: actions/checkout@v6
+#     # - name: Fix pip entries
+#     #   run: |
+#     #     python3 -m pip uninstall -y pip
+#     #     python3 -m ensurepip --upgrade
+#     #     python3 -m pip install --upgrade pip
       
-    # - name: Show pip version after uninstall
-    #   run: |
-    #       echo "Checking pip version after uninstall:"
-    #       if command -v pip3; then
-    #         echo "pip3 still exists!"
-    #         pip3 --version
-    #         exit 1
-    #       else
-    #         echo "pip3 successfully removed."
-    #       fi
-    # - name: Force reinstall pip
-    #   run: python3 -m ensurepip --upgrade
+#     # - name: Show pip version after uninstall
+#     #   run: |
+#     #       echo "Checking pip version after uninstall:"
+#     #       if command -v pip3; then
+#     #         echo "pip3 still exists!"
+#     #         pip3 --version
+#     #         exit 1
+#     #       else
+#     #         echo "pip3 successfully removed."
+#     #       fi
+#     # - name: Force reinstall pip
+#     #   run: python3 -m ensurepip --upgrade
 
-    - name: Print tool cache directory
-      run: echo "$RUNNER_TOOL_CACHE"
-    # - name: Install dependencies
-    #   run: |
-    #       sudo rm -rf /Users/runner/hostedtoolcache/Python
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: 3.13.9
-        # pip-version: '25.0.1'
-        cache: 'pip' 
+#     - name: Print tool cache directory
+#       run: echo "$RUNNER_TOOL_CACHE"
+#     # - name: Install dependencies
+#     #   run: |
+#     #       sudo rm -rf /Users/runner/hostedtoolcache/Python
+#     - name: Set up Python
+#       uses: actions/setup-python@v6
+#       with:
+#         python-version: 3.13.9
+#         # pip-version: '25.0.1'
+#         cache: 'pip' 
         
 
-    - name: Display Python version
-      run: python --version
+#     - name: Display Python version
+#       run: python --version
 
-    - name: Check pip
-      run: |
-        which pip
-        pip --version
+#     - name: Check pip
+#       run: |
+#         which pip
+#         pip --version
+
+
+name: repro-setup-python-root-warning
+
+on:
+  push:
+
+jobs:
+  repro:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:24.04
+      options: --user root
+    steps:
+      - name: Install prerequisites
+        run: |
+          apt-get update
+          apt-get install -y curl ca-certificates git
+
+      - name: Check user
+        run: |
+          whoami
+          id -u
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Show pip version
+        run: python -m pip --version
