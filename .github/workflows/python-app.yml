@@ -102,10 +102,10 @@ jobs:
           id -u
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: priyagupta108/setup-python@pip-warning 
         with:
           python-version: '3.12.12'
-          pip-version: '25.0.1'
+          # pip-version: '25.0.1'
 
       - name: Show pip version
         run: python -m pip --version
