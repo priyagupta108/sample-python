@@ -102,9 +102,10 @@ jobs:
           id -u
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        # uses: actions/setup-python@v6
+        uses: lmvysakh/setup-python@rootuser_warning_fix
         with:
-          python-version: '3.12.12'
+          python-version: '3.11.6'
           # pip-version: '25.0.1'
 
       - name: Show pip version
