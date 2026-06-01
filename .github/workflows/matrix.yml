@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest, macos-13, ubuntu-24.04-arm, windows-11-arm]
+        os: [windows-latest, ubuntu-latest, macos-latest, ubuntu-24.04-arm, windows-11-arm]
         
 
     steps:
@@ -20,7 +20,7 @@ jobs:
       - name: Set up Python
         uses: priyagupta108/setup-python@pip-version-input
         with:
-          python-version: 3.13
+          python-version: 3.13.10
        
   
 
