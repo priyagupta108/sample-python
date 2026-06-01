@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest, macos-13, ubuntu-24.04-arm, windows-11-arm]
-        pip-version: ['24.1', '25.0.1']
+        
 
     steps:
       - name: Checkout repository
@@ -21,7 +21,7 @@ jobs:
         uses: priyagupta108/setup-python@pip-version-input
         with:
           python-version: 3.13
-          pip-version: ${{ matrix.pip-version }}
+       
   
 
       - name: Verify pip version
