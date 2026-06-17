@@ -8,11 +8,12 @@ on:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Run validation composite action
       
-        uses: priyagupta108/sample-python@main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
