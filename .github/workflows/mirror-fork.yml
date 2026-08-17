@@ -1,0 +1,95 @@
+name: Mirror / GitHub fork (API path)
+
+# Non-default {owner}/{repo}/{branch} coordinates, which is the gap the PR's
+# current E2E job leaves open: it sets `mirror` to the default value, so it
+# resolves to the same coordinates as a run with no `mirror` at all.
+#
+# These jobs go through tc.getManifestFromRepo() against api.github.com.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [mirror-test]
+
+env:
+  FORK_MIRROR: 'https://raw.githubusercontent.com/priyagupta108/python-versions/main'
+  PY_VERSION: '3.11.7'
+
+jobs:
+  fork-with-default-token:
+    name: 'Fork via API / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+          - ubuntu-24.04-arm
+          - windows-11-arm
+
+    steps:
+      - name: Set up Python from fork
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.PY_VERSION }}
+          mirror: ${{ env.FORK_MIRROR }}
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "$PY_VERSION" ]; then
+            echo "::error::expected $PY_VERSION, got $actual"
+            exit 1
+          fi
+
+  fork-with-empty-token:
+    # Anonymous API call: exercises the `auth === undefined` branch in
+    # getManifestFromRepo() and the 60/hr unauthenticated rate limit.
+    name: 'Fork via API, no token / ubuntu-latest'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python from fork without a token
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.PY_VERSION }}
+          mirror: ${{ env.FORK_MIRROR }}
+          token: ''
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "$PY_VERSION" ]; then
+            echo "::error::expected $PY_VERSION, got $actual"
+            exit 1
+          fi
+
+  fork-with-mirror-token:
+    # mirror-token must win over token for the API call, and must be sent with
+    # the `token ` prefix that api.github.com requires.
+    name: 'Fork via API, mirror-token wins / ubuntu-latest'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python from fork with mirror-token
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.PY_VERSION }}
+          mirror: ${{ env.FORK_MIRROR }}
+          mirror-token: ${{ github.token }}
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "$PY_VERSION" ]; then
+            echo "::error::expected $PY_VERSION, got $actual"
+            exit 1
+          fi

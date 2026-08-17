@@ -1,0 +1,164 @@
+name: Mirror / failure paths
+
+# Every one of these must FAIL. A green setup step here means the action
+# silently fell back to the default manifest, which is the failure mode that
+# looks like success.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [mirror-test]
+
+permissions:
+  contents: read
+  actions: read
+  checks: read
+
+jobs:
+  must-fail:
+    name: 'Must fail: ${{ matrix.case.name }}'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        case:
+          - name: invalid-url
+            mirror: 'not a url'
+            version: '3.11.7'
+          - name: unreachable-host
+            # .invalid is reserved by RFC 2606 and can never resolve, so this
+            # needs no external fixture.
+            mirror: 'https://mirror.invalid'
+            version: '3.11.7'
+          - name: manifest-404-non-github-host
+            mirror: 'https://priyagupta108.github.io/python-versions/does-not-exist'
+            version: '3.11.7'
+          - name: manifest-404-github-coords
+            # Both paths fail: the API call 404s on the branch, then the raw URL
+            # fallback 404s too.
+            mirror: 'https://raw.githubusercontent.com/priyagupta108/python-versions/no-such-branch-xyz'
+            version: '3.11.7'
+          - name: version-absent-everywhere
+            mirror: 'https://priyagupta108.github.io/python-versions'
+            version: '3.99.0'
+
+    steps:
+      - name: Record start time
+        shell: bash
+        run: echo "started=$(date +%s)" >> "$GITHUB_ENV"
+
+      - name: Set up Python with a broken mirror
+        id: setup
+        continue-on-error: true
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ matrix.case.version }}
+          mirror: ${{ matrix.case.mirror }}
+
+      - name: Assert the step failed
+        shell: bash
+        run: |
+          elapsed=$(( $(date +%s) - started ))
+          echo "outcome=${{ steps.setup.outcome }} elapsed=${elapsed}s"
+          # Review point 2: a non-GitHub mirror should not burn the API path's
+          # retry budget before falling through. Reported, not asserted, since
+          # wall-clock on a shared runner is too noisy to gate on.
+          echo "- \`${{ matrix.case.name }}\`: outcome=\`${{ steps.setup.outcome }}\`, elapsed=\`${elapsed}s\`" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.setup.outcome }}" != "failure" ]; then
+            echo "::error::expected failure for '${{ matrix.case.name }}', got '${{ steps.setup.outcome }}'"
+            exit 1
+          fi
+
+      - name: Assert python was not left on PATH
+        shell: bash
+        run: |
+          # A failed setup must not have exported a half-installed interpreter.
+          if command -v python >/dev/null 2>&1; then
+            echo "python on PATH: $(python -c 'import sys; print(sys.version)' 2>&1 || true)"
+          else
+            echo "no python on PATH"
+          fi
+
+  arch-unavailable-on-arm:
+    # win32-arm64 builds only start at 3.11.0, so 3.9.13 exists in the mirror
+    # manifest but not for this runner's arch. The "not found" message is built
+    # via getManifestUrl(), so this is also the find-python.ts path where a
+    # non-memoized getMirror() would have masked the real cause.
+    name: 'Must fail: arch absent from manifest (windows-11-arm)'
+    runs-on: windows-11-arm
+
+    steps:
+      - name: Request a version with no win32-arm64 build
+        id: setup
+        continue-on-error: true
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: '3.9.13'
+          mirror: 'https://raw.githubusercontent.com/priyagupta108/python-versions/main'
+
+      - name: Assert the step failed
+        shell: bash
+        run: |
+          echo "outcome=${{ steps.setup.outcome }}"
+          if [ "${{ steps.setup.outcome }}" != "failure" ]; then
+            echo "::error::expected failure, got '${{ steps.setup.outcome }}'"
+            exit 1
+          fi
+
+  assert-error-messages:
+    # Review point 5: a malformed `mirror` must report itself, not be masked by
+    # a downstream error, and the "version not found" message must name the
+    # mirror's manifest URL rather than the default one. Asserting only that the
+    # step failed would pass in both the fixed and the broken case.
+    name: 'Assert error messages'
+    runs-on: ubuntu-latest
+    needs: [must-fail, arch-unavailable-on-arm]
+    steps:
+      - name: Collect annotations for this run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs?per_page=100" \
+            --jq '.jobs[].id' > job-ids.txt
+          : > annotations.txt
+          while read -r id; do
+            gh api "/repos/$GITHUB_REPOSITORY/check-runs/$id/annotations" \
+              --jq '.[] | "\(.annotation_level): \(.message)"' >> annotations.txt || true
+          done < job-ids.txt
+          echo "--- annotations ---"
+          cat annotations.txt
+
+      - name: Assert the real cause was surfaced
+        shell: bash
+        run: |
+          set -uo pipefail
+          failed=0
+
+          # A malformed mirror must name itself.
+          if grep -qF -- "Invalid 'mirror' URL" annotations.txt; then
+            echo "ok: invalid mirror reported directly"
+          else
+            echo "::error::malformed mirror did not surface \"Invalid 'mirror' URL\""
+            failed=1
+          fi
+
+          # The not-found message must point at the mirror's manifest.
+          if grep -qF -- "priyagupta108.github.io/python-versions/versions-manifest.json" annotations.txt; then
+            echo "ok: not-found message names the Pages mirror manifest"
+          else
+            echo "::error::not-found message did not name the mirror manifest URL"
+            failed=1
+          fi
+
+          # ...and never at the default one, which would mean `mirror` was
+          # dropped somewhere between getMirror() and find-python.ts.
+          if grep -qF -- "actions/python-versions/main/versions-manifest.json" annotations.txt; then
+            echo "::error::default manifest URL leaked into an error message despite a custom mirror"
+            failed=1
+          else
+            echo "ok: default manifest URL absent"
+          fi
+
+          exit "$failed"

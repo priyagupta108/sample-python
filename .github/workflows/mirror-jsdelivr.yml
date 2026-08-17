@@ -1,0 +1,78 @@
+name: Mirror / jsDelivr (third-party host)
+
+# Smoke test against a genuinely third-party CDN. jsDelivr serves the unpruned
+# upstream manifest, so this cannot be falsifiable the way mirror-pages.yml is —
+# it only shows that a non-GitHub host outside GitHub's control resolves and
+# installs end to end.
+#
+# continue-on-error is deliberate: a jsDelivr 429/403 is not a defect in the PR,
+# and should not red-X a run whose real subject is our own mirror.
+#
+# The mirror-token here is a dummy. mirror-token is sent verbatim to the mirror
+# host, so a real secret must never be pointed at a third-party CDN.
+
+on:
+  workflow_dispatch:
+
+env:
+  JSDELIVR_MIRROR: 'https://cdn.jsdelivr.net/gh/actions/python-versions@main'
+  PY_VERSION: '3.11.7'
+
+jobs:
+  jsdelivr-anonymous:
+    name: 'jsDelivr, no mirror-token / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+          - ubuntu-24.04-arm
+          - windows-11-arm
+
+    steps:
+      - name: Set up Python from jsDelivr
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.PY_VERSION }}
+          mirror: ${{ env.JSDELIVR_MIRROR }}
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "$PY_VERSION" ]; then
+            echo "::error::expected $PY_VERSION, got $actual"
+            exit 1
+          fi
+
+  jsdelivr-with-dummy-mirror-token:
+    # A mirror that ignores the Authorization header must still work when one is
+    # sent, and the dummy credential must not break the GitHub-hosted downloads
+    # that the manifest points at.
+    name: 'jsDelivr, dummy mirror-token / ubuntu-latest'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Set up Python with a dummy mirror-token
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.PY_VERSION }}
+          mirror: ${{ env.JSDELIVR_MIRROR }}
+          mirror-token: 'Bearer dummy-not-a-secret'
+          token: ${{ github.token }}
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "$PY_VERSION" ]; then
+            echo "::error::expected $PY_VERSION, got $actual"
+            exit 1
+          fi

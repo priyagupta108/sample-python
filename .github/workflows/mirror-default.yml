@@ -1,0 +1,65 @@
+name: Mirror / default resolution
+
+# Baseline, plus the `mirror` values that are supposed to behave exactly like no
+# mirror at all. Any divergence between these four cases is a regression.
+#
+# Note on `refs-heads-form`: the PR's own E2E job uses this value to force the
+# direct-URL path, but it also trips resolveRepoCoords()'s "branch names
+# containing '/' are not supported" warning, because the host is still
+# raw.githubusercontent.com. See mirror-warnings.yml.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [mirror-test]
+
+env:
+  # 3.11.7 exists for all six platform/arch combos the matrix covers, including
+  # win32-arm64 (which starts at 3.11.0). It is also an old patch — latest 3.11
+  # is 3.11.16 — so it is never in the runner tool cache and the manifest is
+  # genuinely fetched instead of the install being short-circuited.
+  PY_VERSION: '3.11.7'
+
+jobs:
+  equivalent-mirrors:
+    name: '${{ matrix.case.name }} / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+          - ubuntu-24.04-arm
+          - windows-11-arm
+        case:
+          - name: no-input
+            mirror: ''
+          - name: explicit-default
+            mirror: 'https://raw.githubusercontent.com/actions/python-versions/main'
+          - name: trailing-slashes
+            mirror: 'https://raw.githubusercontent.com/actions/python-versions/main///'
+          - name: refs-heads-form
+            mirror: 'https://raw.githubusercontent.com/actions/python-versions/refs/heads/main'
+
+    steps:
+      - name: Set up Python
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.PY_VERSION }}
+          mirror: ${{ matrix.case.mirror }}
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "$PY_VERSION" ]; then
+            echo "::error::expected $PY_VERSION, got $actual"
+            exit 1
+          fi
+
+      - name: Assert python is on PATH and usable
+        shell: bash
+        run: python -c 'import sysconfig; print(sysconfig.get_paths()["stdlib"])'

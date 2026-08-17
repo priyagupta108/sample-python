@@ -1,0 +1,133 @@
+name: Mirror / GitHub Pages (non-GitHub host)
+
+# github.io does not match isGitHubHost(), so this is a genuine non-GitHub
+# mirror: the manifest is fetched by direct URL, `token` is withheld from the
+# mirror host, and the tarballs the manifest points at still come from GitHub.
+#
+# FALSIFIABILITY: these jobs only mean something if the manifest served at
+# PAGES_MIRROR is PRUNED relative to upstream. Set HIT_VERSION to a version the
+# pruned manifest serves and MISS_VERSION to one it omits but upstream still
+# has. If the manifest is an unpruned copy, `mirror-miss` will fail for the
+# wrong reason and `mirror-hit` proves nothing.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [mirror-test]
+
+env:
+  PAGES_MIRROR: 'https://priyagupta108.github.io/python-versions'
+  HIT_VERSION: '3.11.7'
+  MISS_VERSION: '3.10.11'
+
+jobs:
+  mirror-hit:
+    name: 'Pages mirror hit / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+          - ubuntu-24.04-arm
+          - windows-11-arm
+
+    steps:
+      - name: Set up Python from Pages mirror
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.HIT_VERSION }}
+          mirror: ${{ env.PAGES_MIRROR }}
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "$HIT_VERSION" ]; then
+            echo "::error::expected $HIT_VERSION, got $actual"
+            exit 1
+          fi
+
+  mirror-token-leak-guard:
+    # Regression test for review point 1, and the one auth case CI can actually
+    # decide. The mirror-token is deliberately invalid; github.io ignores the
+    # Authorization header, so the manifest fetch succeeds either way. The
+    # manifest's download_url entries point at GitHub, which does NOT ignore a
+    # bad credential. So this job passes only if mirror-token stays on the
+    # nominated host and the download falls through to `token`; if authForUrl()
+    # regresses to returning mirror-token first, the download 401s and this
+    # fails.
+    name: 'mirror-token must not leak to GitHub download host / ubuntu-latest'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python with an invalid mirror-token
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.HIT_VERSION }}
+          mirror: ${{ env.PAGES_MIRROR }}
+          mirror-token: 'Bearer invalid-credential-must-not-be-forwarded'
+          token: ${{ github.token }}
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "$HIT_VERSION" ]; then
+            echo "::error::expected $HIT_VERSION, got $actual"
+            exit 1
+          fi
+
+  mirror-miss:
+    # The version exists upstream but not in the pruned mirror manifest. If this
+    # succeeds, the action fell back to the default manifest and the `mirror`
+    # input did not take effect.
+    name: 'Pages mirror miss must fail / ubuntu-latest'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Request a version the mirror does not serve
+        id: setup
+        continue-on-error: true
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.MISS_VERSION }}
+          mirror: ${{ env.PAGES_MIRROR }}
+
+      - name: Assert the step failed
+        shell: bash
+        run: |
+          echo "outcome=${{ steps.setup.outcome }}"
+          if [ "${{ steps.setup.outcome }}" != "failure" ]; then
+            echo "::error::expected failure, got '${{ steps.setup.outcome }}' — the mirror manifest was not used"
+            exit 1
+          fi
+
+  mirror-with-token-withheld:
+    # `token` is set but must not reach the github.io host. The download_url
+    # entries still point at GitHub, so the install must succeed anyway — that
+    # combination is the whole point of the per-host auth rule.
+    name: 'Pages mirror, token withheld from mirror host / ubuntu-latest'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python with a token that must not be forwarded
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.HIT_VERSION }}
+          mirror: ${{ env.PAGES_MIRROR }}
+          token: ${{ github.token }}
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "$HIT_VERSION" ]; then
+            echo "::error::expected $HIT_VERSION, got $actual"
+            exit 1
+          fi

@@ -1,0 +1,173 @@
+name: Mirror / input combinations
+
+# `mirror` has to coexist with the rest of the action's inputs. These are the
+# combinations where a mirror could plausibly interfere: anything that resolves
+# a version specifier, re-reads the manifest, or short-circuits on the tool
+# cache.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [mirror-test]
+
+env:
+  FORK_MIRROR: 'https://raw.githubusercontent.com/priyagupta108/python-versions/main'
+  # Old patch (latest 3.11 is 3.11.16) so it is never tool-cached, and present
+  # for every platform/arch in the matrix including win32-arm64.
+  PY_VERSION: '3.11.7'
+
+jobs:
+  mirror-with-cache:
+    name: 'mirror + cache / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+          - ubuntu-24.04-arm
+          - windows-11-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python with cache
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.PY_VERSION }}
+          mirror: ${{ env.FORK_MIRROR }}
+          cache: 'pip'
+          cache-dependency-path: '**/requirements.txt'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+  mirror-with-check-latest:
+    # check-latest forces a manifest lookup even when the tool cache already has
+    # a satisfying version, so the mirror must be consulted here.
+    name: 'mirror + check-latest / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+          - ubuntu-24.04-arm
+          - windows-11-arm
+    steps:
+      - name: Set up Python with check-latest
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: '3.11'
+          mirror: ${{ env.FORK_MIRROR }}
+          check-latest: true
+
+      - name: Assert 3.11.x
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          case "$actual" in
+            3.11.*) ;;
+            *) echo "::error::expected 3.11.x, got $actual"; exit 1 ;;
+          esac
+
+  mirror-with-version-file:
+    name: 'mirror + python-version-file / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-11-arm]
+    steps:
+      - name: Write .python-version
+        shell: bash
+        run: echo "$PY_VERSION" > .python-version
+
+      - name: Set up Python from version file
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version-file: '.python-version'
+          mirror: ${{ env.FORK_MIRROR }}
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "$PY_VERSION" ]; then
+            echo "::error::expected $PY_VERSION, got $actual"
+            exit 1
+          fi
+
+  mirror-with-freethreaded:
+    # Free-threaded builds are separate manifest entries, so a mirror that only
+    # partly mirrors upstream would show up here first. All six platform/arch
+    # combos have free-threaded 3.13 builds.
+    name: 'mirror + free-threaded / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+          - ubuntu-24.04-arm
+          - windows-11-arm
+    steps:
+      - name: Set up free-threaded Python
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: '3.13t'
+          mirror: ${{ env.FORK_MIRROR }}
+
+      - name: Assert GIL is disabled
+        shell: bash
+        run: |
+          python -c 'import sys; print(sys.version); assert not sys._is_gil_enabled(), "expected a free-threaded build"'
+
+  mirror-with-ranges:
+    name: 'mirror + ${{ matrix.spec }} / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+        spec: ['3.11', '>=3.11 <3.13', '3.12.x', '3.14.0-alpha.1']
+    steps:
+      - name: Set up Python from a range
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ matrix.spec }}
+          mirror: ${{ env.FORK_MIRROR }}
+          allow-prereleases: true
+
+      - name: Report resolved version
+        shell: bash
+        run: python -c 'import sys; print(sys.version)'
+
+  mirror-multiple-versions:
+    # Multiple specs mean multiple manifest consumers in one run, which is what
+    # the memoized getMirror() is there to keep from re-validating each time.
+    name: 'mirror + multiple versions / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-11-arm]
+    steps:
+      - name: Set up several Pythons
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: |
+            3.11.7
+            3.12.7
+          mirror: ${{ env.FORK_MIRROR }}
+
+      - name: Report resolved version
+        shell: bash
+        run: python -c 'import sys; print(sys.version)'

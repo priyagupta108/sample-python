@@ -1,0 +1,116 @@
+name: Mirror / warnings
+
+# core.warning() output is only assertable through the check-run annotations
+# API, so the warning cases live here rather than being scattered across the
+# other workflows.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [mirror-test]
+
+permissions:
+  contents: read
+  actions: read
+  checks: read
+
+env:
+  FORK_MIRROR: 'https://raw.githubusercontent.com/priyagupta108/python-versions/main'
+
+jobs:
+  pypy-with-mirror:
+    # `mirror` is ignored for PyPy, which resolves from downloads.python.org.
+    # It must warn and still install.
+    name: 'PyPy with mirror'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up PyPy with a mirror set
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: 'pypy3.10'
+          mirror: ${{ env.FORK_MIRROR }}
+
+      - name: Assert PyPy installed anyway
+        shell: bash
+        run: python -c 'import sys; print(sys.implementation.name, sys.version)'
+
+  graalpy-with-mirror:
+    # Same for GraalPy, which resolves from the GitHub releases API.
+    name: 'GraalPy with mirror'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up GraalPy with a mirror set
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: 'graalpy-24.0'
+          mirror: ${{ env.FORK_MIRROR }}
+
+      - name: Assert GraalPy installed anyway
+        shell: bash
+        run: python -c 'import sys; print(sys.implementation.name, sys.version)'
+
+  unparseable-coords:
+    # refs/heads/main is a legitimate raw.githubusercontent.com form, but it
+    # does not match {owner}/{repo}/{branch}, so it drops to the direct-URL
+    # fetch and warns about slashes in branch names. Worth deciding whether that
+    # warning should fire for a URL that contains no branch slash at all — the
+    # PR's own E2E job uses exactly this value.
+    name: 'Unparseable repo coords'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python via refs/heads form
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: '3.11.7'
+          mirror: 'https://raw.githubusercontent.com/priyagupta108/python-versions/refs/heads/main'
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "3.11.7" ]; then
+            echo "::error::expected 3.11.7, got $actual"
+            exit 1
+          fi
+
+  assert-annotations:
+    name: 'Assert warning annotations'
+    runs-on: ubuntu-latest
+    needs: [pypy-with-mirror, graalpy-with-mirror, unparseable-coords]
+    steps:
+      - name: Collect annotations for this run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs?per_page=100" \
+            --jq '.jobs[].id' > job-ids.txt
+          : > annotations.txt
+          while read -r id; do
+            gh api "/repos/$GITHUB_REPOSITORY/check-runs/$id/annotations" \
+              --jq '.[] | "\(.annotation_level): \(.message)"' >> annotations.txt || true
+          done < job-ids.txt
+          echo "--- annotations ---"
+          cat annotations.txt
+
+      - name: Assert expected warnings were emitted
+        shell: bash
+        run: |
+          set -uo pipefail
+          failed=0
+          expected=(
+            "is ignored for PyPy"
+            "is ignored for GraalPy"
+            "Branch names containing '/' are not supported"
+          )
+          for want in "${expected[@]}"; do
+            if grep -qF -- "$want" annotations.txt; then
+              echo "ok: $want"
+            else
+              echo "::error::missing expected warning: $want"
+              failed=1
+            fi
+          done
+          exit "$failed"
