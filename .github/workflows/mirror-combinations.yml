@@ -164,8 +164,8 @@ jobs:
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
         with:
           python-version: |
-            3.11.7
-            3.12.7
+            3.11.16
+            3.12.14
           mirror: ${{ env.FORK_MIRROR }}
 
       - name: Report resolved version

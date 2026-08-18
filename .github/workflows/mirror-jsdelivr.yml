@@ -5,8 +5,10 @@ name: Mirror / jsDelivr (third-party host)
 # it only shows that a non-GitHub host outside GitHub's control resolves and
 # installs end to end.
 #
-# continue-on-error is deliberate: a jsDelivr 429/403 is not a defect in the PR,
-# and should not red-X a run whose real subject is our own mirror.
+# python-version is an exact pin, so the setup step is its own assertion: if the
+# manifest cannot be fetched or does not offer that exact build, the action
+# fails. A jsDelivr 429/403 therefore fails this workflow, which is the intended
+# trade for not masking real breakage.
 #
 # The mirror-token here is a dummy. mirror-token is sent verbatim to the mirror
 # host, so a real secret must never be pointed at a third-party CDN.
@@ -24,7 +26,6 @@ jobs:
   jsdelivr-anonymous:
     name: 'jsDelivr, no mirror-token / ${{ matrix.os }}'
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -42,15 +43,9 @@ jobs:
           python-version: ${{ env.PY_VERSION }}
           mirror: ${{ env.JSDELIVR_MIRROR }}
 
-      - name: Assert resolved version
+      - name: Report resolved version
         shell: bash
-        run: |
-          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
-          echo "resolved=$actual"
-          if [ "$actual" != "$PY_VERSION" ]; then
-            echo "::error::expected $PY_VERSION, got $actual"
-            exit 1
-          fi
+        run: python -c 'import sys; print(sys.version)'
 
   jsdelivr-with-dummy-mirror-token:
     # A mirror that ignores the Authorization header must still work when one is
@@ -58,7 +53,6 @@ jobs:
     # that the manifest points at.
     name: 'jsDelivr, dummy mirror-token / ubuntu-latest'
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     steps:
       - name: Set up Python with a dummy mirror-token
@@ -69,12 +63,6 @@ jobs:
           mirror-token: 'Bearer dummy-not-a-secret'
           token: ${{ github.token }}
 
-      - name: Assert resolved version
+      - name: Report resolved version
         shell: bash
-        run: |
-          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
-          echo "resolved=$actual"
-          if [ "$actual" != "$PY_VERSION" ]; then
-            echo "::error::expected $PY_VERSION, got $actual"
-            exit 1
-          fi
+        run: python -c 'import sys; print(sys.version)'

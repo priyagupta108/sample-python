@@ -49,6 +49,8 @@ jobs:
 
       - name: Set up Python with a broken mirror
         id: setup
+        # Load-bearing: this step is expected to fail, and without this the job
+        # aborts here and the assertion below never runs.
         continue-on-error: true
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
         with:
@@ -90,6 +92,7 @@ jobs:
     steps:
       - name: Request a version with no win32-arm64 build
         id: setup
+        # Load-bearing, as above.
         continue-on-error: true
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
         with:

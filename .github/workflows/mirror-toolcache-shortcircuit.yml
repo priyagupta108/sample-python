@@ -183,8 +183,14 @@ jobs:
           fi
 
   proposed-job-shape:
-    # What the PR's E2E job should look like: a mirror that is actually on the
-    # critical path, against a working mirror. Expected to PASS.
+    # The working-mirror half of the check-latest A/B: identical inputs to
+    # `check-latest-forces-resolution`, differing only in the mirror. That job
+    # must fail and this one must pass — the outcome now depends on the mirror,
+    # which is exactly what the job as written fails to achieve.
+    #
+    # Asserting only "3.12.x" would be vacuous again, since the cached
+    # interpreter satisfies it too. So when the manifest's newest 3.12 differs
+    # from the one baked into the image, this asserts the manifest's answer won.
     name: 'Proposed job shape / ${{ matrix.os }}'
     runs-on: ${{ matrix.os }}
     strategy:
@@ -193,6 +199,23 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
+      - name: Record the preinstalled 3.12 patch
+        shell: bash
+        run: |
+          cached=$(ls -1 "$RUNNER_TOOL_CACHE/Python" 2>/dev/null \
+            | grep -E '^3\.12\.[0-9]+$' | sort -t. -k3 -n | tail -1)
+          echo "cached_312=${cached:-none}" >> "$GITHUB_ENV"
+          echo "preinstalled 3.12 in tool cache: ${cached:-none}"
+
+      - name: Resolve the manifest's newest 3.12
+        shell: bash
+        run: |
+          latest=$(curl -sSL "$WORKING_MIRROR/versions-manifest.json" \
+            | jq -r '[.[] | select(.stable) | .version | select(test("^3\\.12\\.[0-9]+$"))]
+                     | max_by(split(".")[2] | tonumber) // "none"')
+          echo "manifest_312=$latest" >> "$GITHUB_ENV"
+          echo "newest 3.12 in manifest: $latest"
+
       - name: Set up Python via mirror with check-latest
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
         with:
@@ -200,12 +223,30 @@ jobs:
           mirror: ${{ env.WORKING_MIRROR }}
           check-latest: true
 
-      - name: Assert 3.12.x resolved
+      - name: Assert the manifest decided the version
         shell: bash
         run: |
           actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
-          echo "resolved=$actual"
+          echo "resolved=$actual  cached=$cached_312  manifest=$manifest_312"
+          echo "- \`${{ matrix.os }}\` cached=\`$cached_312\` manifest=\`$manifest_312\` resolved=\`$actual\`" >> "$GITHUB_STEP_SUMMARY"
+
           case "$actual" in
             3.12.*) ;;
             *) echo "::error::expected 3.12.x, got $actual"; exit 1 ;;
           esac
+
+          if [ "$manifest_312" = "none" ]; then
+            echo "::error::could not read a 3.12 version from the mirror manifest"
+            exit 1
+          fi
+
+          if [ "$cached_312" = "$manifest_312" ]; then
+            # Image already ships the manifest's newest 3.12, so resolving from
+            # either source looks identical. Inconclusive rather than passing.
+            echo "::notice::Image ships $cached_312, the same version the manifest offers — this image cannot distinguish the two sources."
+          elif [ "$actual" = "$manifest_312" ]; then
+            echo "check-latest took the manifest's answer ($manifest_312) over the cached $cached_312"
+          else
+            echo "::error::resolved $actual but the manifest offers $manifest_312 — check-latest did not use the mirror"
+            exit 1
+          fi

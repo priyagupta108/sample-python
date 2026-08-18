@@ -92,6 +92,8 @@ jobs:
     steps:
       - name: Request a version the mirror does not serve
         id: setup
+        # Load-bearing: the failure IS the expected result, so the job must be
+        # allowed to reach the assertion below.
         continue-on-error: true
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
         with:
