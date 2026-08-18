@@ -49,6 +49,37 @@ jobs:
         shell: bash
         run: python -c 'import sys; print(sys.implementation.name, sys.version)'
 
+  pypy-without-mirror:
+    # `mirror` is ignored for PyPy, which resolves from downloads.python.org.
+    # It must warn and still install.
+    name: 'PyPy without mirror'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up PyPy without a mirror
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: 'pypy3.10'
+         
+      - name: Assert PyPy installed anyway
+        shell: bash
+        run: python -c 'import sys; print(sys.implementation.name, sys.version)'
+
+  graalpy-without-mirror:
+    # Same for GraalPy, which resolves from the GitHub releases API.
+    name: 'GraalPy without mirror'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up GraalPy without a mirror
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: 'graalpy-24.0'
+         
+
+      - name: Assert GraalPy installed anyway
+        shell: bash
+        run: python -c 'import sys; print(sys.implementation.name, sys.version)'
+
+
   unparseable-coords:
     # refs/heads/main is a legitimate raw.githubusercontent.com form, but it
     # does not match {owner}/{repo}/{branch}, so it drops to the direct-URL
@@ -77,7 +108,7 @@ jobs:
   assert-annotations:
     name: 'Assert warning annotations'
     runs-on: ubuntu-latest
-    needs: [pypy-with-mirror, graalpy-with-mirror, unparseable-coords]
+    needs: [pypy-with-mirror, graalpy-with-mirror, pypy-without-mirror, graalpy-without-mirror, unparseable-coords]
     steps:
       - name: Collect annotations for this run
         env:

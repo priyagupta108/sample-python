@@ -13,6 +13,8 @@ name: Mirror / jsDelivr (third-party host)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [mirror-test]
 
 env:
   JSDELIVR_MIRROR: 'https://cdn.jsdelivr.net/gh/actions/python-versions@main'
