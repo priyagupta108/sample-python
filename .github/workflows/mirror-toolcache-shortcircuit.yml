@@ -1,0 +1,164 @@
+name: Mirror / tool-cache short-circuit
+
+# Evidence for the review point that `setup-versions-via-mirror-input` does not
+# exercise the mirror.
+#
+# The method: give the PR's exact job shape a mirror that cannot possibly
+# resolve (`.invalid` is reserved by RFC 2606, so DNS always fails). If the job
+# still succeeds, the manifest was never fetched and the mirror was never
+# contacted — the assertion is the green check itself.
+#
+# Then flip one input at a time to show what turns it back into a real test.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [mirror-test]
+
+env:
+  UNREACHABLE_MIRROR: 'https://mirror.invalid'
+  WORKING_MIRROR: 'https://raw.githubusercontent.com/actions/python-versions/refs/heads/main'
+
+jobs:
+  as-written-is-vacuous:
+    # Reproduces the PR's job: python-version 3.12, no check-latest. Expected to
+    # PASS despite an unresolvable mirror. A failure here would mean the premise
+    # is wrong and 3.12 was not preinstalled on that image.
+    name: 'Vacuous as written / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+          - ubuntu-24.04-arm
+          - windows-11-arm
+
+    steps:
+      - name: Show preinstalled Python tool cache
+        shell: bash
+        run: |
+          echo "RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
+          ls -1 "$RUNNER_TOOL_CACHE/Python" 2>/dev/null || echo "(no Python tool cache directory)"
+
+      - name: Set up Python 3.12 with an unresolvable mirror
+        id: setup
+        continue-on-error: true
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: '3.12'
+          mirror: ${{ env.UNREACHABLE_MIRROR }}
+
+      - name: Assert it succeeded anyway
+        shell: bash
+        run: |
+          echo "outcome=${{ steps.setup.outcome }}"
+          if [ "${{ steps.setup.outcome }}" != "success" ]; then
+            echo "::notice::Step failed, so the mirror WAS contacted on this image — 3.12 was presumably not tool-cached."
+            exit 1
+          fi
+          echo "::warning::Succeeded with an unresolvable mirror: the manifest was never fetched and the mirror was never contacted."
+
+      - name: Show that the interpreter came from the tool cache
+        shell: bash
+        run: |
+          exe=$(python -c 'import sys; print(sys.executable)')
+          echo "sys.executable=$exe"
+          python -c 'import sys; print(sys.version)'
+          norm() { printf '%s' "$1" | tr 'A-Z\\' 'a-z/'; }
+          case "$(norm "$exe")" in
+            "$(norm "$RUNNER_TOOL_CACHE")"*)
+              echo "resolved from the runner tool cache — tc.find() short-circuited" ;;
+            *)
+              echo "::warning::interpreter is outside RUNNER_TOOL_CACHE" ;;
+          esac
+
+  check-latest-forces-resolution:
+    # Same inputs plus check-latest, which resolves against the manifest before
+    # consulting the tool cache. Expected to FAIL, proving the mirror is now on
+    # the critical path.
+    name: 'check-latest reaches the mirror / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Set up Python 3.12 with check-latest and an unresolvable mirror
+        id: setup
+        continue-on-error: true
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: '3.12'
+          mirror: ${{ env.UNREACHABLE_MIRROR }}
+          check-latest: true
+
+      - name: Assert it failed
+        shell: bash
+        run: |
+          echo "outcome=${{ steps.setup.outcome }}"
+          if [ "${{ steps.setup.outcome }}" != "failure" ]; then
+            echo "::error::expected failure — check-latest did not force a manifest fetch"
+            exit 1
+          fi
+          echo "check-latest forced manifest resolution, so the unreachable mirror broke the run as it should"
+
+  uncached-version-forces-resolution:
+    # The other way to make the job real, without check-latest: ask for a patch
+    # the image does not ship. 3.11.7 is old enough never to be tool-cached
+    # (latest 3.11 is 3.11.16). Expected to FAIL.
+    name: 'Uncached patch reaches the mirror / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Set up an uncached patch with an unresolvable mirror
+        id: setup
+        continue-on-error: true
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: '3.11.7'
+          mirror: ${{ env.UNREACHABLE_MIRROR }}
+
+      - name: Assert it failed
+        shell: bash
+        run: |
+          echo "outcome=${{ steps.setup.outcome }}"
+          if [ "${{ steps.setup.outcome }}" != "failure" ]; then
+            echo "::error::expected failure — an uncached patch should have required the manifest"
+            exit 1
+          fi
+
+  proposed-job-shape:
+    # What the PR's E2E job should look like: a mirror that is actually on the
+    # critical path, against a working mirror. Expected to PASS.
+    name: 'Proposed job shape / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Set up Python via mirror with check-latest
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: '3.12'
+          mirror: ${{ env.WORKING_MIRROR }}
+          check-latest: true
+
+      - name: Assert 3.12.x resolved
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          case "$actual" in
+            3.12.*) ;;
+            *) echo "::error::expected 3.12.x, got $actual"; exit 1 ;;
+          esac
