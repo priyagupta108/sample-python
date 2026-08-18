@@ -3,12 +3,15 @@ name: Mirror / tool-cache short-circuit
 # Evidence for the review point that `setup-versions-via-mirror-input` does not
 # exercise the mirror.
 #
-# The method: give the PR's exact job shape a mirror that cannot possibly
-# resolve (`.invalid` is reserved by RFC 2606, so DNS always fails). If the job
-# still succeeds, the manifest was never fetched and the mirror was never
-# contacted — the assertion is the green check itself.
+# The method is an A/B pair. Two jobs run the PR's exact job shape and differ in
+# exactly one character of input: one gets a working mirror, the other a mirror
+# that cannot possibly resolve (`.invalid` is reserved by RFC 2606, so DNS
+# always fails). Both are expected to pass, and to land on the same interpreter.
+# An input that makes no difference when it is broken is an input the job never
+# used.
 #
-# Then flip one input at a time to show what turns it back into a real test.
+# The remaining jobs flip one input at a time to show what turns it back into a
+# real test.
 
 on:
   workflow_dispatch:
@@ -65,14 +68,58 @@ jobs:
         shell: bash
         run: |
           exe=$(python -c 'import sys; print(sys.executable)')
+          version=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$version"
           echo "sys.executable=$exe"
-          python -c 'import sys; print(sys.version)'
+          echo "- \`${{ matrix.os }}\` unreachable mirror -> \`$version\`" >> "$GITHUB_STEP_SUMMARY"
           norm() { printf '%s' "$1" | tr 'A-Z\\' 'a-z/'; }
           case "$(norm "$exe")" in
             "$(norm "$RUNNER_TOOL_CACHE")"*)
               echo "resolved from the runner tool cache — tc.find() short-circuited" ;;
             *)
               echo "::warning::interpreter is outside RUNNER_TOOL_CACHE" ;;
+          esac
+
+  as-written-with-working-mirror:
+    # The control half of the pair: the PR's job exactly as written, against a
+    # mirror that actually serves a manifest. Expected to PASS and to resolve
+    # the same interpreter as the unreachable-mirror job, which is what shows
+    # the outcome does not depend on the mirror at all.
+    name: 'As written, working mirror / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+          - ubuntu-24.04-arm
+          - windows-11-arm
+
+    steps:
+      - name: Set up Python 3.12 with a working mirror
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: '3.12'
+          mirror: ${{ env.WORKING_MIRROR }}
+
+      - name: Report resolved interpreter
+        shell: bash
+        run: |
+          exe=$(python -c 'import sys; print(sys.executable)')
+          version=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$version"
+          echo "sys.executable=$exe"
+          # Compare this against the unreachable-mirror job: same version, same
+          # tool-cache path, opposite mirror.
+          echo "- \`${{ matrix.os }}\` working mirror -> \`$version\`" >> "$GITHUB_STEP_SUMMARY"
+          norm() { printf '%s' "$1" | tr 'A-Z\\' 'a-z/'; }
+          case "$(norm "$exe")" in
+            "$(norm "$RUNNER_TOOL_CACHE")"*)
+              echo "::warning::Resolved from the tool cache even with a working mirror — the manifest was not consulted here either." ;;
+            *)
+              echo "interpreter is outside RUNNER_TOOL_CACHE, so this one really was downloaded" ;;
           esac
 
   check-latest-forces-resolution:
