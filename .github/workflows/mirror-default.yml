@@ -40,6 +40,8 @@ jobs:
             mirror: 'https://raw.githubusercontent.com/actions/python-versions/main'
           - name: trailing-slashes
             mirror: 'https://raw.githubusercontent.com/actions/python-versions/main///'
+          - name: padded-whitespace
+            mirror: '   https://raw.githubusercontent.com/actions/python-versions/main   '
           - name: refs-heads-form
             mirror: 'https://raw.githubusercontent.com/actions/python-versions/refs/heads/main'
 
@@ -63,3 +65,32 @@ jobs:
       - name: Assert python is on PATH and usable
         shell: bash
         run: python -c 'import sysconfig; print(sysconfig.get_paths()["stdlib"])'
+
+  mirror-input-omitted:
+    # Every matrix case above passes a `mirror:` key, so they all exercise
+    # getInput() returning a value — including the empty string. This job omits
+    # the key entirely, which is the only way to exercise action.yml's `default`
+    # being applied. The two are different code paths and only one of them is
+    # what the vast majority of users actually hit.
+    name: 'mirror key omitted / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Set up Python without a mirror input
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.PY_VERSION }}
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "$PY_VERSION" ]; then
+            echo "::error::expected $PY_VERSION, got $actual"
+            exit 1
+          fi

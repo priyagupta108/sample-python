@@ -93,3 +93,33 @@ jobs:
             echo "::error::expected $PY_VERSION, got $actual"
             exit 1
           fi
+
+  fork-with-invalid-mirror-token:
+    # getManifestFromRepo() builds its own auth (`token ${mirrorToken}`) rather
+    # than going through authForUrl(), so that path is untested by the jobs
+    # above. An invalid credential must surface as a failure; a pass means the
+    # run fell through to an anonymous fetch and mirror-token was silently
+    # ignored on a mirror the user explicitly nominated.
+    name: 'Fork via API, invalid mirror-token must fail / ubuntu-latest'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python with a bad mirror-token
+        id: setup
+        # Load-bearing: the failure is the expected result.
+        continue-on-error: true
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.PY_VERSION }}
+          mirror: ${{ env.FORK_MIRROR }}
+          mirror-token: 'ghp_invalidcredentialfortestsmustnotauthenticate'
+
+      - name: Assert the step failed
+        shell: bash
+        run: |
+          echo "outcome=${{ steps.setup.outcome }}"
+          if [ "${{ steps.setup.outcome }}" != "failure" ]; then
+            echo "::error::expected failure — an invalid mirror-token was accepted, so either the API call fell back to an anonymous fetch or the credential was dropped"
+            exit 1
+          fi
+          echo "invalid mirror-token failed the run rather than falling through"

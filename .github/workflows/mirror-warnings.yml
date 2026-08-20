@@ -110,38 +110,65 @@ jobs:
     runs-on: ubuntu-latest
     needs: [pypy-with-mirror, graalpy-with-mirror, pypy-without-mirror, graalpy-without-mirror, unparseable-coords]
     steps:
-      - name: Collect annotations for this run
+      - name: Collect annotations per job
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
+          # Keyed by job name. Flattening every annotation into one file can
+          # only assert presence, and presence is satisfied by any job — so a
+          # warning that fires unconditionally would look correct.
           gh api "/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs?per_page=100" \
-            --jq '.jobs[].id' > job-ids.txt
-          : > annotations.txt
-          while read -r id; do
+            --jq '.jobs[] | "\(.id)\t\(.name)"' > jobs.tsv
+          : > annotations.tsv
+          while IFS=$'\t' read -r id name; do
             gh api "/repos/$GITHUB_REPOSITORY/check-runs/$id/annotations" \
-              --jq '.[] | "\(.annotation_level): \(.message)"' >> annotations.txt || true
-          done < job-ids.txt
+              --jq --arg job "$name" '.[] | "\($job)\t\(.annotation_level)\t\(.message)"' \
+              >> annotations.tsv || true
+          done < jobs.tsv
           echo "--- annotations ---"
-          cat annotations.txt
+          cat annotations.tsv
 
-      - name: Assert expected warnings were emitted
+      - name: Assert warnings fire only where expected
         shell: bash
         run: |
           set -uo pipefail
           failed=0
-          expected=(
-            "is ignored for PyPy"
-            "is ignored for GraalPy"
-            "Branch names containing '/' are not supported"
-          )
-          for want in "${expected[@]}"; do
-            if grep -qF -- "$want" annotations.txt; then
-              echo "ok: $want"
+
+          # in_job <exact job name> <substring> -> 0 if that job emitted it
+          in_job() {
+            awk -F'\t' -v job="$1" -v want="$2" \
+              '$1 == job && index($3, want) { found = 1 } END { exit found ? 0 : 1 }' \
+              annotations.tsv
+          }
+
+          expect_warns() {
+            if in_job "$1" "$2"; then
+              echo "ok: '$1' warned"
             else
-              echo "::error::missing expected warning: $want"
+              echo "::error::'$1' did not emit expected warning: $2"
               failed=1
             fi
-          done
+          }
+
+          expect_silent() {
+            if in_job "$1" "$2"; then
+              echo "::error::'$1' emitted a mirror warning with no mirror input set"
+              failed=1
+            else
+              echo "ok: '$1' stayed silent"
+            fi
+          }
+
+          expect_warns  "PyPy with mirror"        "is ignored for PyPy"
+          expect_warns  "GraalPy with mirror"     "is ignored for GraalPy"
+          expect_warns  "Unparseable repo coords" "Branch names containing '/' are not supported"
+
+          # The guard is `if (!core.getInput('mirror')) return;`. If it never
+          # trips, every PyPy/GraalPy run warns and the expect_warns checks above
+          # still pass — these are what catch that.
+          expect_silent "PyPy without mirror"     "only applies to CPython"
+          expect_silent "GraalPy without mirror"  "only applies to CPython"
+
           exit "$failed"

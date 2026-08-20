@@ -30,7 +30,7 @@ jobs:
           - ubuntu-24.04-arm
           - windows-11-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python with cache
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
