@@ -50,8 +50,9 @@ jobs:
         run: python -c 'import sys; print(sys.implementation.name, sys.version)'
 
   pypy-without-mirror:
-    # `mirror` is ignored for PyPy, which resolves from downloads.python.org.
-    # It must warn and still install.
+    # Control for pypy-with-mirror: with no mirror input the warning must not
+    # fire. Without this job, a warning that fired unconditionally would still
+    # satisfy the with-mirror check.
     name: 'PyPy without mirror'
     runs-on: ubuntu-latest
     steps:
@@ -65,7 +66,7 @@ jobs:
         run: python -c 'import sys; print(sys.implementation.name, sys.version)'
 
   graalpy-without-mirror:
-    # Same for GraalPy, which resolves from the GitHub releases API.
+    # Control for graalpy-with-mirror, as above.
     name: 'GraalPy without mirror'
     runs-on: ubuntu-latest
     steps:
@@ -123,12 +124,21 @@ jobs:
             --jq '.jobs[] | "\(.id)\t\(.name)"' > jobs.tsv
           : > annotations.tsv
           while IFS=$'\t' read -r id name; do
+            # `gh api` has no --arg, so the job name is prefixed in the shell.
             gh api "/repos/$GITHUB_REPOSITORY/check-runs/$id/annotations" \
-              --jq --arg job "$name" '.[] | "\($job)\t\(.annotation_level)\t\(.message)"' \
-              >> annotations.tsv || true
+              --jq '.[] | "\(.annotation_level)\t\(.message)"' \
+            | while IFS= read -r line; do
+                printf '%s\t%s\n' "$name" "$line" >> annotations.tsv
+              done
           done < jobs.tsv
           echo "--- annotations ---"
           cat annotations.tsv
+          # An empty file would make every expect_silent below pass vacuously,
+          # which is how a broken collection step looks like a green suite.
+          if [ ! -s annotations.tsv ]; then
+            echo "::error::no annotations collected; the assertions would be vacuous"
+            exit 1
+          fi
 
       - name: Assert warnings fire only where expected
         shell: bash
@@ -154,10 +164,10 @@ jobs:
 
           expect_silent() {
             if in_job "$1" "$2"; then
-              echo "::error::'$1' emitted a mirror warning with no mirror input set"
+              echo "::error::'$1' warned about 'mirror' even though no mirror input was set"
               failed=1
             else
-              echo "ok: '$1' stayed silent"
+              echo "ok: '$1' did not warn, which is correct with no mirror input"
             fi
           }
 

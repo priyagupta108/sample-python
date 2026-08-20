@@ -158,14 +158,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, windows-11-arm]
+        os: [ubuntu-latest, windows-latest, macos-latest, ubuntu-24.04-arm, windows-11-arm]
     steps:
       - name: Set up several Pythons
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
         with:
           python-version: |
-            3.11.16
-            3.12.14
+            3.11.7
+            3.12.7
           mirror: ${{ env.FORK_MIRROR }}
 
       - name: Report resolved version

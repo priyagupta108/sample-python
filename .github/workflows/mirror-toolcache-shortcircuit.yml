@@ -200,14 +200,29 @@ jobs:
           echo "cached_312=${cached:-none}" >> "$GITHUB_ENV"
           echo "preinstalled 3.12 in tool cache: ${cached:-none}"
 
-      - name: Resolve the manifest's newest 3.12
+      - name: Resolve the manifest's newest 3.12 for this platform
         shell: bash
         run: |
+          # The newest patch is not built for every platform — 3.12.14 is
+          # Linux-only — so this must be filtered per platform/arch, or Windows
+          # and macOS fail for a reason that has nothing to do with the mirror.
+          case "$RUNNER_OS" in
+            Linux)   plat=linux ;;
+            Windows) plat=win32 ;;
+            macOS)   plat=darwin ;;
+            *) echo "::error::unknown RUNNER_OS=$RUNNER_OS"; exit 1 ;;
+          esac
+          arch=$(printf '%s' "$RUNNER_ARCH" | tr 'A-Z' 'a-z')
           latest=$(curl -sSL "$WORKING_MIRROR/versions-manifest.json" \
-            | jq -r '[.[] | select(.stable) | .version | select(test("^3\\.12\\.[0-9]+$"))]
-                     | max_by(split(".")[2] | tonumber) // "none"')
+            | jq -r --arg plat "$plat" --arg arch "$arch" '
+                [ .[]
+                  | select(.stable)
+                  | select(.version | test("^3\\.12\\.[0-9]+$"))
+                  | select(any(.files[]; .platform == $plat and .arch == $arch and ((.filename // "") | test("freethreaded") | not)))
+                  | .version ]
+                | max_by(split(".")[2] | tonumber) // "none"')
           echo "manifest_312=$latest" >> "$GITHUB_ENV"
-          echo "newest 3.12 in manifest: $latest"
+          echo "newest 3.12 for $plat-$arch: $latest"
 
       - name: Set up Python via mirror with check-latest
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
