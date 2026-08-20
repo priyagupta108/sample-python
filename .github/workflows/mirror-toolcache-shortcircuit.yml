@@ -24,10 +24,14 @@ env:
 
 jobs:
   as-written-is-vacuous:
-    # Reproduces the PR's job: python-version 3.12, no check-latest. Expected to
-    # PASS despite an unresolvable mirror. A failure here would mean the premise
-    # is wrong and 3.12 was not preinstalled on that image.
-    name: 'Vacuous as written / ${{ matrix.os }}'
+    # Reproduces the PR's job: python-version 3.12, no check-latest, against a
+    # mirror that cannot resolve. Passing IS the finding, so no assertion is
+    # needed. If it goes red, the premise did not hold — 3.12 was not tool-cached
+    # on that image — and setup-python's own DNS error says so.
+    #
+    # Deliberately step-for-step identical to as-written-with-working-mirror;
+    # the mirror value is the only difference between the two jobs.
+    name: 'As written, unreachable mirror / ${{ matrix.os }}'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -47,24 +51,12 @@ jobs:
           ls -1 "$RUNNER_TOOL_CACHE/Python" 2>/dev/null || echo "(no Python tool cache directory)"
 
       - name: Set up Python 3.12 with an unresolvable mirror
-        id: setup
-        continue-on-error: true
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
         with:
           python-version: '3.12'
           mirror: ${{ env.UNREACHABLE_MIRROR }}
 
-      - name: Assert it succeeded anyway
-        shell: bash
-        run: |
-          echo "outcome=${{ steps.setup.outcome }}"
-          if [ "${{ steps.setup.outcome }}" != "success" ]; then
-            echo "::notice::Step failed, so the mirror WAS contacted on this image — 3.12 was presumably not tool-cached."
-            exit 1
-          fi
-          echo "::warning::Succeeded with an unresolvable mirror: the manifest was never fetched and the mirror was never contacted."
-
-      - name: Show that the interpreter came from the tool cache
+      - name: Report resolved interpreter
         shell: bash
         run: |
           exe=$(python -c 'import sys; print(sys.executable)')
@@ -72,6 +64,7 @@ jobs:
           echo "resolved=$version"
           echo "sys.executable=$exe"
           echo "- \`${{ matrix.os }}\` unreachable mirror -> \`$version\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "::warning::Reached this step with an unresolvable mirror, so the manifest was never fetched."
           norm() { printf '%s' "$1" | tr 'A-Z\\' 'a-z/'; }
           case "$(norm "$exe")" in
             "$(norm "$RUNNER_TOOL_CACHE")"*)
