@@ -1,0 +1,137 @@
+name: Mirror / riscv64 (real-world mirror)
+
+# The PR's motivating use case, using the author's own production mirror rather
+# than a synthetic fixture.
+#
+# riseproject-dev/python-versions publishes 158 releases and every single file
+# entry is linux-riscv64 — no x64, arm64, darwin or win32 builds at all. That
+# makes it decisively falsifiable on GitHub-hosted runners, which are none of
+# those things: 3.11.7 exists in BOTH manifests, so the only difference between
+# the two jobs below is which manifest was read.
+#
+#   default mirror + 3.11.7 -> installs
+#   riscv64 mirror + 3.11.7 -> "not found for architecture"
+#
+# A mirror input that was being ignored would make both jobs pass.
+#
+# Note this mirror still serves its tarballs from github.com (its own release
+# assets), so it does not exercise the non-GitHub download path either.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [mirror-test]
+
+permissions:
+  contents: read
+  actions: read
+  checks: read
+
+env:
+  RISCV_MIRROR: 'https://raw.githubusercontent.com/riseproject-dev/python-versions/main'
+  # Present in both the riscv64 mirror and upstream, so the outcome turns on the
+  # mirror rather than on the version existing.
+  PY_VERSION: '3.11.7'
+
+jobs:
+  riscv64-mirror-unusable-here:
+    # Must FAIL: the mirror has no build for any hosted runner's architecture.
+    name: 'riscv64 mirror has no build for ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+
+    steps:
+      - name: Set up Python from the riscv64 mirror
+        id: setup
+        # Load-bearing: the failure is the expected result.
+        continue-on-error: true
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.PY_VERSION }}
+          mirror: ${{ env.RISCV_MIRROR }}
+
+      - name: Assert the step failed
+        shell: bash
+        run: |
+          echo "outcome=${{ steps.setup.outcome }}"
+          if [ "${{ steps.setup.outcome }}" != "failure" ]; then
+            echo "::error::expected failure — this mirror only has riscv64 builds, so a pass means the manifest came from somewhere else"
+            exit 1
+          fi
+
+  default-mirror-same-version:
+    # The control that gives the job above its meaning: identical version and
+    # runner, default mirror, must PASS.
+    name: 'default mirror, same version / ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+
+    steps:
+      - name: Set up Python from the default mirror
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.PY_VERSION }}
+
+      - name: Assert resolved version
+        shell: bash
+        run: |
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "$PY_VERSION" ]; then
+            echo "::error::expected $PY_VERSION, got $actual"
+            exit 1
+          fi
+
+  assert-error-names-the-mirror:
+    # The failure message is built with getManifestUrl(), so it must name the
+    # riscv64 manifest. If it names the default one instead, `mirror` was lost
+    # between getMirror() and find-python.ts.
+    name: 'Assert error names the riscv64 manifest'
+    runs-on: ubuntu-latest
+    needs: [riscv64-mirror-unusable-here, default-mirror-same-version]
+
+    steps:
+      - name: Collect annotations for this run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs?per_page=100" \
+            --jq '.jobs[].id' > job-ids.txt
+          : > annotations.txt
+          while read -r id; do
+            gh api "/repos/$GITHUB_REPOSITORY/check-runs/$id/annotations" \
+              --jq '.[].message' >> annotations.txt || true
+          done < job-ids.txt
+          echo "--- annotations ---"
+          cat annotations.txt
+          if [ ! -s annotations.txt ]; then
+            echo "::error::no annotations collected; the assertions would be vacuous"
+            exit 1
+          fi
+
+      - name: Assert the message points at the riscv64 manifest
+        shell: bash
+        run: |
+          set -uo pipefail
+          failed=0
+
+          if grep -qF -- "riseproject-dev/python-versions/main/versions-manifest.json" annotations.txt; then
+            echo "ok: not-found message names the riscv64 mirror manifest"
+          else
+            echo "::error::not-found message did not name the riscv64 mirror manifest"
+            failed=1
+          fi
+
+          if grep -qF -- "riscv64" annotations.txt; then
+            echo "ok: riscv64 referenced in the failure output"
+          fi
+
+          exit "$failed"
