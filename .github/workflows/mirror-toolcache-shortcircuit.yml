@@ -1,54 +1,66 @@
 name: Mirror / tool-cache short-circuit
 
-# Evidence for the review point that `setup-versions-via-mirror-input` does not
-# exercise the mirror.
+# Every combination of {unreachable, working} mirror x {cached, uncached,
+# check-latest, old patch}, so the one case that ignores the mirror stands out
+# against the seven that do not.
 #
-# The method is an A/B pair. Two jobs run the PR's exact job shape and differ in
-# exactly one character of input: one gets a working mirror, the other a mirror
-# that cannot possibly resolve (`.invalid` is reserved by RFC 2606, so DNS
-# always fails). Both are expected to pass, and to land on the same interpreter.
-# An input that makes no difference when it is broken is an input the job never
-# used.
+#   unreachable + hosted-cache-version -> PASSES   <- the finding
+#   unreachable + non-cached           -> fails
+#   unreachable + check-latest         -> fails
+#   unreachable + old-patch            -> fails
+#   working     + all four             -> pass
 #
-# A mirror input that makes no difference when it is broken is an input the job
-# never used.
+# `.invalid` is reserved by RFC 2606, so DNS can never resolve it. A job that
+# survives it never fetched the manifest. That is exactly the shape of the PR's
+# own E2E job (3.12, no check-latest), which is why it proves nothing.
 #
-# The remaining jobs run against the working mirror and show the two ways to put
-# it back on the critical path: check-latest, which resolves before consulting
-# the tool cache, and asking for a patch the image does not ship.
+# No continue-on-error: the four expected failures go red, and setup-python's
+# own error is the evidence.
 
 on:
   workflow_dispatch:
   push:
     branches: [mirror-test]
 
-env:
-  UNREACHABLE_MIRROR: 'https://mirror.invalid'
-  # Three path segments, so it parses as {owner}/{repo}/{branch} and resolves
-  # via the GitHub API without warnings. The PR's own job uses the refs/heads/
-  # form, which warns spuriously; that case is covered in mirror-warnings.yml.
-  WORKING_MIRROR: 'https://raw.githubusercontent.com/actions/python-versions/main'
-
 jobs:
-  as-written-is-vacuous:
-    # Reproduces the PR's job: python-version 3.12, no check-latest, against a
-    # mirror that cannot resolve. Passing IS the finding, so no assertion is
-    # needed. If it goes red, the premise did not hold — 3.12 was not tool-cached
-    # on that image — and setup-python's own DNS error says so.
-    #
-    # Deliberately step-for-step identical to as-written-with-working-mirror;
-    # the mirror value is the only difference between the two jobs.
-    name: 'As written, unreachable mirror / ${{ matrix.os }}'
-    runs-on: ${{ matrix.os }}
+  grid:
+    name: '${{ matrix.mirror.name }} + ${{ matrix.case.name }}'
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
-          - macos-latest
-          - ubuntu-24.04-arm
-          - windows-11-arm
+        mirror:
+          - name: unreachable mirror
+            url: 'https://mirror.invalid'
+          # Three path segments, so it parses as {owner}/{repo}/{branch} and
+          # resolves via the GitHub API without the spurious slash-branch
+          # warning the refs/heads/ form produces.
+          - name: working mirror
+            url: 'https://raw.githubusercontent.com/priyagupta108/python-versions/main'
+        case:
+          # Preinstalled on the image, so tc.find() answers before the manifest
+          # is ever consulted.
+          - name: hosted cache version
+            version: '3.12'
+            latest: false
+            prerelease: false
+          # 3.15 is prerelease-only (newest 3.15.0-rc.1), so no image ships it
+          # and the cache cannot help. allow-prereleases is required or `3.15`
+          # matches no stable release.
+          - name: non cache
+            version: '3.15'
+            latest: false
+            prerelease: true
+          # Resolves against the manifest before consulting the tool cache.
+          - name: check-latest
+            version: '3.12'
+            latest: true
+            prerelease: false
+          # Old patch (latest 3.11 is 3.11.16), so never tool-cached.
+          - name: patch
+            version: '3.11.7'
+            latest: false
+            prerelease: false
 
     steps:
       - name: Show preinstalled Python tool cache
@@ -57,11 +69,13 @@ jobs:
           echo "RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
           ls -1 "$RUNNER_TOOL_CACHE/Python" 2>/dev/null || echo "(no Python tool cache directory)"
 
-      - name: Set up Python 3.12 with an unresolvable mirror
+      - name: Set up Python
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
         with:
-          python-version: '3.12'
-          mirror: ${{ env.UNREACHABLE_MIRROR }}
+          python-version: ${{ matrix.case.version }}
+          mirror: ${{ matrix.mirror.url }}
+          check-latest: ${{ matrix.case.latest }}
+          allow-prereleases: ${{ matrix.case.prerelease }}
 
       - name: Report resolved interpreter
         shell: bash
@@ -70,196 +84,11 @@ jobs:
           version=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
           echo "resolved=$version"
           echo "sys.executable=$exe"
-          echo "- \`${{ matrix.os }}\` unreachable mirror -> \`$version\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "::warning::Reached this step with an unresolvable mirror, so the manifest was never fetched."
+          echo "- \`${{ matrix.mirror.name }}\` + \`${{ matrix.case.name }}\` -> \`$version\`" >> "$GITHUB_STEP_SUMMARY"
           norm() { printf '%s' "$1" | tr 'A-Z\\' 'a-z/'; }
           case "$(norm "$exe")" in
             "$(norm "$RUNNER_TOOL_CACHE")"*)
-              echo "resolved from the runner tool cache — tc.find() short-circuited" ;;
+              echo "came from the runner tool cache" ;;
             *)
-              echo "::warning::interpreter is outside RUNNER_TOOL_CACHE" ;;
+              echo "interpreter is outside RUNNER_TOOL_CACHE, so it was downloaded" ;;
           esac
-
-  as-written-with-working-mirror:
-    # The control half of the pair: the PR's job exactly as written, against a
-    # mirror that actually serves a manifest. Expected to PASS and to resolve
-    # the same interpreter as the unreachable-mirror job, which is what shows
-    # the outcome does not depend on the mirror at all.
-    name: 'As written, working mirror / ${{ matrix.os }}'
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
-          - macos-latest
-          - ubuntu-24.04-arm
-          - windows-11-arm
-
-    steps:
-      - name: Set up Python 3.12 with a working mirror
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
-        with:
-          python-version: '3.12'
-          mirror: ${{ env.WORKING_MIRROR }}
-
-      - name: Report resolved interpreter
-        shell: bash
-        run: |
-          exe=$(python -c 'import sys; print(sys.executable)')
-          version=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
-          echo "resolved=$version"
-          echo "sys.executable=$exe"
-          # Compare this against the unreachable-mirror job: same version, same
-          # tool-cache path, opposite mirror.
-          echo "- \`${{ matrix.os }}\` working mirror -> \`$version\`" >> "$GITHUB_STEP_SUMMARY"
-          norm() { printf '%s' "$1" | tr 'A-Z\\' 'a-z/'; }
-          case "$(norm "$exe")" in
-            "$(norm "$RUNNER_TOOL_CACHE")"*)
-              echo "::warning::Resolved from the tool cache even with a working mirror — the manifest was not consulted here either." ;;
-            *)
-              echo "interpreter is outside RUNNER_TOOL_CACHE, so this one really was downloaded" ;;
-          esac
-
-  check-latest-forces-resolution:
-    # check-latest resolves against the manifest before consulting the tool
-    # cache, so the mirror is on the critical path here even though 3.12 is
-    # preinstalled on every image.
-    name: 'check-latest reaches the mirror / ${{ matrix.os }}'
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
-    steps:
-      - name: Set up Python 3.12 with check-latest
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
-        with:
-          python-version: '3.12'
-          mirror: ${{ env.WORKING_MIRROR }}
-          check-latest: true
-
-      - name: Assert 3.12.x resolved
-        shell: bash
-        run: |
-          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
-          echo "resolved=$actual"
-          case "$actual" in
-            3.12.*) ;;
-            *) echo "::error::expected 3.12.x, got $actual"; exit 1 ;;
-          esac
-
-  uncached-version-forces-resolution:
-    # The other way to put the mirror on the critical path, without
-    # check-latest: ask for a patch the image does not ship. 3.11.7 is old
-    # enough never to be tool-cached (latest 3.11 is 3.11.16), so the log shows
-    # a cache miss followed by a download from the mirror's manifest.
-    name: 'Uncached patch reaches the mirror / ${{ matrix.os }}'
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
-    steps:
-      - name: Set up an uncached patch
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
-        with:
-          python-version: '3.11.7'
-          mirror: ${{ env.WORKING_MIRROR }}
-
-      - name: Assert resolved version
-        shell: bash
-        run: |
-          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
-          echo "resolved=$actual"
-          if [ "$actual" != "3.11.7" ]; then
-            echo "::error::expected 3.11.7, got $actual"
-            exit 1
-          fi
-
-  proposed-job-shape:
-    # The working-mirror half of the check-latest A/B: identical inputs to
-    # `check-latest-forces-resolution`, differing only in the mirror. That job
-    # must fail and this one must pass — the outcome now depends on the mirror,
-    # which is exactly what the job as written fails to achieve.
-    #
-    # Asserting only "3.12.x" would be vacuous again, since the cached
-    # interpreter satisfies it too. So when the manifest's newest 3.12 differs
-    # from the one baked into the image, this asserts the manifest's answer won.
-    name: 'Proposed job shape / ${{ matrix.os }}'
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
-    steps:
-      - name: Record the preinstalled 3.12 patch
-        shell: bash
-        run: |
-          cached=$(ls -1 "$RUNNER_TOOL_CACHE/Python" 2>/dev/null \
-            | grep -E '^3\.12\.[0-9]+$' | sort -t. -k3 -n | tail -1)
-          echo "cached_312=${cached:-none}" >> "$GITHUB_ENV"
-          echo "preinstalled 3.12 in tool cache: ${cached:-none}"
-
-      - name: Resolve the manifest's newest 3.12 for this platform
-        shell: bash
-        run: |
-          # The newest patch is not built for every platform — 3.12.14 is
-          # Linux-only — so this must be filtered per platform/arch, or Windows
-          # and macOS fail for a reason that has nothing to do with the mirror.
-          case "$RUNNER_OS" in
-            Linux)   plat=linux ;;
-            Windows) plat=win32 ;;
-            macOS)   plat=darwin ;;
-            *) echo "::error::unknown RUNNER_OS=$RUNNER_OS"; exit 1 ;;
-          esac
-          arch=$(printf '%s' "$RUNNER_ARCH" | tr 'A-Z' 'a-z')
-          latest=$(curl -sSL "$WORKING_MIRROR/versions-manifest.json" \
-            | jq -r --arg plat "$plat" --arg arch "$arch" '
-                [ .[]
-                  | select(.stable)
-                  | select(.version | test("^3\\.12\\.[0-9]+$"))
-                  | select(any(.files[]; .platform == $plat and .arch == $arch and ((.filename // "") | test("freethreaded") | not)))
-                  | .version ]
-                | max_by(split(".")[2] | tonumber) // "none"')
-          echo "manifest_312=$latest" >> "$GITHUB_ENV"
-          echo "newest 3.12 for $plat-$arch: $latest"
-
-      - name: Set up Python via mirror with check-latest
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
-        with:
-          python-version: '3.12'
-          mirror: ${{ env.WORKING_MIRROR }}
-          check-latest: true
-
-      - name: Assert the manifest decided the version
-        shell: bash
-        run: |
-          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
-          echo "resolved=$actual  cached=$cached_312  manifest=$manifest_312"
-          echo "- \`${{ matrix.os }}\` cached=\`$cached_312\` manifest=\`$manifest_312\` resolved=\`$actual\`" >> "$GITHUB_STEP_SUMMARY"
-
-          case "$actual" in
-            3.12.*) ;;
-            *) echo "::error::expected 3.12.x, got $actual"; exit 1 ;;
-          esac
-
-          if [ "$manifest_312" = "none" ]; then
-            echo "::error::could not read a 3.12 version from the mirror manifest"
-            exit 1
-          fi
-
-          if [ "$cached_312" = "$manifest_312" ]; then
-            # Image already ships the manifest's newest 3.12, so resolving from
-            # either source looks identical. Inconclusive rather than passing.
-            echo "::notice::Image ships $cached_312, the same version the manifest offers — this image cannot distinguish the two sources."
-          elif [ "$actual" = "$manifest_312" ]; then
-            echo "check-latest took the manifest's answer ($manifest_312) over the cached $cached_312"
-          else
-            echo "::error::resolved $actual but the manifest offers $manifest_312 — check-latest did not use the mirror"
-            exit 1
-          fi
