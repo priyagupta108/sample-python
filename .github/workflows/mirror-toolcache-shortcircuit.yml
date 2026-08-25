@@ -10,8 +10,12 @@ name: Mirror / tool-cache short-circuit
 # An input that makes no difference when it is broken is an input the job never
 # used.
 #
-# The remaining jobs flip one input at a time to show what turns it back into a
-# real test.
+# A mirror input that makes no difference when it is broken is an input the job
+# never used.
+#
+# The remaining jobs run against the working mirror and show the two ways to put
+# it back on the critical path: check-latest, which resolves before consulting
+# the tool cache, and asking for a patch the image does not ship.
 
 on:
   workflow_dispatch:
@@ -20,7 +24,10 @@ on:
 
 env:
   UNREACHABLE_MIRROR: 'https://mirror.invalid'
-  WORKING_MIRROR: 'https://raw.githubusercontent.com/actions/python-versions/refs/heads/main'
+  # Three path segments, so it parses as {owner}/{repo}/{branch} and resolves
+  # via the GitHub API without warnings. The PR's own job uses the refs/heads/
+  # form, which warns spuriously; that case is covered in mirror-warnings.yml.
+  WORKING_MIRROR: 'https://raw.githubusercontent.com/actions/python-versions/main'
 
 jobs:
   as-written-is-vacuous:
@@ -116,9 +123,9 @@ jobs:
           esac
 
   check-latest-forces-resolution:
-    # Same inputs plus check-latest, which resolves against the manifest before
-    # consulting the tool cache. Expected to FAIL, proving the mirror is now on
-    # the critical path.
+    # check-latest resolves against the manifest before consulting the tool
+    # cache, so the mirror is on the critical path here even though 3.12 is
+    # preinstalled on every image.
     name: 'check-latest reaches the mirror / ${{ matrix.os }}'
     runs-on: ${{ matrix.os }}
     strategy:
@@ -127,29 +134,28 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - name: Set up Python 3.12 with check-latest and an unresolvable mirror
-        id: setup
-        continue-on-error: true
+      - name: Set up Python 3.12 with check-latest
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
         with:
           python-version: '3.12'
-          mirror: ${{ env.UNREACHABLE_MIRROR }}
+          mirror: ${{ env.WORKING_MIRROR }}
           check-latest: true
 
-      - name: Assert it failed
+      - name: Assert 3.12.x resolved
         shell: bash
         run: |
-          echo "outcome=${{ steps.setup.outcome }}"
-          if [ "${{ steps.setup.outcome }}" != "failure" ]; then
-            echo "::error::expected failure — check-latest did not force a manifest fetch"
-            exit 1
-          fi
-          echo "check-latest forced manifest resolution, so the unreachable mirror broke the run as it should"
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          case "$actual" in
+            3.12.*) ;;
+            *) echo "::error::expected 3.12.x, got $actual"; exit 1 ;;
+          esac
 
   uncached-version-forces-resolution:
-    # The other way to make the job real, without check-latest: ask for a patch
-    # the image does not ship. 3.11.7 is old enough never to be tool-cached
-    # (latest 3.11 is 3.11.16). Expected to FAIL.
+    # The other way to put the mirror on the critical path, without
+    # check-latest: ask for a patch the image does not ship. 3.11.7 is old
+    # enough never to be tool-cached (latest 3.11 is 3.11.16), so the log shows
+    # a cache miss followed by a download from the mirror's manifest.
     name: 'Uncached patch reaches the mirror / ${{ matrix.os }}'
     runs-on: ${{ matrix.os }}
     strategy:
@@ -158,20 +164,19 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - name: Set up an uncached patch with an unresolvable mirror
-        id: setup
-        continue-on-error: true
+      - name: Set up an uncached patch
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
         with:
           python-version: '3.11.7'
-          mirror: ${{ env.UNREACHABLE_MIRROR }}
+          mirror: ${{ env.WORKING_MIRROR }}
 
-      - name: Assert it failed
+      - name: Assert resolved version
         shell: bash
         run: |
-          echo "outcome=${{ steps.setup.outcome }}"
-          if [ "${{ steps.setup.outcome }}" != "failure" ]; then
-            echo "::error::expected failure — an uncached patch should have required the manifest"
+          actual=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          echo "resolved=$actual"
+          if [ "$actual" != "3.11.7" ]; then
+            echo "::error::expected 3.11.7, got $actual"
             exit 1
           fi
 
