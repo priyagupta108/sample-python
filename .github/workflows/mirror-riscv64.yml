@@ -23,7 +23,8 @@ env:
 
 jobs:
   riscv64:
-    name: 'riscv64 ${{ env.PY_VERSION }}'
+    # Literal versions: the env context is not available in a job-level `name`.
+    name: 'riscv64 3.11.7'
     runs-on: ubuntu-latest
 
     steps:
@@ -38,7 +39,7 @@ jobs:
     # Free-threaded is a separate arch value in the manifest
     # (`riscv64-freethreaded`), not a flag, so this exercises a different
     # manifest entry rather than the same one twice.
-    name: 'riscv64 ${{ env.FT_VERSION }}'
+    name: 'riscv64 3.13t'
     runs-on: ubuntu-latest
 
     steps:
