@@ -14,6 +14,11 @@ name: Mirror / riscv64 (real-world mirror)
 #
 # A mirror input that was being ignored would make both jobs pass.
 #
+# The mirror jobs here carry no continue-on-error: they are expected to go RED,
+# and setup-python's own error message is the evidence. Only
+# assert-error-names-the-mirror needs to stay green, which is why it runs with
+# if: always().
+#
 # Note this mirror still serves its tarballs from github.com (its own release
 # assets), so it does not exercise the non-GitHub download path either.
 
@@ -32,10 +37,13 @@ env:
   # Present in both the riscv64 mirror and upstream, so the outcome turns on the
   # mirror rather than on the version existing.
   PY_VERSION: '3.11.7'
+  # Free-threaded exists for 3.13 and 3.14 in both manifests.
+  FT_VERSION: '3.13t'
 
 jobs:
   riscv64-mirror-unusable-here:
-    # Must FAIL: the mirror has no build for any hosted runner's architecture.
+    # Expected to go RED, and the red is the result: setup-python's own
+    # "not found for architecture" error names the mirror it consulted.
     name: 'riscv64 mirror has no build for ${{ matrix.os }}'
     runs-on: ${{ matrix.os }}
     strategy:
@@ -45,22 +53,10 @@ jobs:
 
     steps:
       - name: Set up Python from the riscv64 mirror
-        id: setup
-        # Load-bearing: the failure is the expected result.
-        continue-on-error: true
         uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
         with:
           python-version: ${{ env.PY_VERSION }}
           mirror: ${{ env.RISCV_MIRROR }}
-
-      - name: Assert the step failed
-        shell: bash
-        run: |
-          echo "outcome=${{ steps.setup.outcome }}"
-          if [ "${{ steps.setup.outcome }}" != "failure" ]; then
-            echo "::error::expected failure — this mirror only has riscv64 builds, so a pass means the manifest came from somewhere else"
-            exit 1
-          fi
 
   default-mirror-same-version:
     # The control that gives the job above its meaning: identical version and
@@ -88,13 +84,92 @@ jobs:
             exit 1
           fi
 
+  arch-override-reaches-download:
+    # With the arch forced to riscv64 the manifest lookup SUCCEEDS, so the run
+    # gets past resolution and into the download — the only job in the suite
+    # that reaches a mirror-designated download_url. It still fails, because a
+    # riscv64 binary cannot run on an x64 runner, but it fails somewhere else,
+    # and that difference is the assertion.
+    #
+    # Exactly where it dies (download, extract, or the setup script) is not
+    # worth pinning down, so this only asserts that resolution got past "not
+    # found", which is checked in assert-error-names-the-mirror below.
+    name: 'riscv64 arch override reaches the download'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python forcing riscv64
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.PY_VERSION }}
+          architecture: 'riscv64'
+          mirror: ${{ env.RISCV_MIRROR }}
+
+  freethreaded-mirror-unusable-here:
+    # Free-threaded builds are a separate arch value in the manifest
+    # (`riscv64-freethreaded`), not a flag, so `3.13t` on an x64 runner looks
+    # for `x64-freethreaded` — which this mirror does not have either.
+    name: 'riscv64 freethreaded mirror has no build for ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+
+    steps:
+      - name: Set up free-threaded Python from the riscv64 mirror
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.FT_VERSION }}
+          mirror: ${{ env.RISCV_MIRROR }}
+
+  freethreaded-default-mirror:
+    # Control: the same free-threaded spec resolves fine against the default
+    # mirror, so the failure above is about the mirror and not about `3.13t`.
+    name: 'default mirror, same freethreaded version / ubuntu-latest'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up free-threaded Python from the default mirror
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.FT_VERSION }}
+
+      - name: Assert the GIL is disabled
+        shell: bash
+        run: python -c 'import sys; print(sys.version); assert not sys._is_gil_enabled(), "expected a free-threaded build"'
+
+  freethreaded-arch-override:
+    # As arch-override-reaches-download, but for the freethreaded arch variant:
+    # forcing riscv64 makes `riscv64-freethreaded` match, so resolution succeeds
+    # and the run reaches a mirror-designated download_url.
+    name: 'riscv64 freethreaded arch override reaches the download'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up free-threaded Python forcing riscv64
+        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        with:
+          python-version: ${{ env.FT_VERSION }}
+          architecture: 'riscv64'
+          mirror: ${{ env.RISCV_MIRROR }}
+
   assert-error-names-the-mirror:
     # The failure message is built with getManifestUrl(), so it must name the
     # riscv64 manifest. If it names the default one instead, `mirror` was lost
     # between getMirror() and find-python.ts.
     name: 'Assert error names the riscv64 manifest'
     runs-on: ubuntu-latest
-    needs: [riscv64-mirror-unusable-here, default-mirror-same-version]
+    # The mirror jobs are expected to be red, and a failed dependency would
+    # otherwise skip this job and silently drop every assertion below.
+    if: always()
+    needs:
+      - riscv64-mirror-unusable-here
+      - default-mirror-same-version
+      - arch-override-reaches-download
+      - freethreaded-mirror-unusable-here
+      - freethreaded-default-mirror
+      - freethreaded-arch-override
 
     steps:
       - name: Collect annotations for this run
@@ -104,15 +179,18 @@ jobs:
         run: |
           set -euo pipefail
           gh api "/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs?per_page=100" \
-            --jq '.jobs[].id' > job-ids.txt
-          : > annotations.txt
-          while read -r id; do
+            --jq '.jobs[] | "\(.id)\t\(.name)"' > jobs.tsv
+          : > annotations.tsv
+          while IFS=$'\t' read -r id name; do
             gh api "/repos/$GITHUB_REPOSITORY/check-runs/$id/annotations" \
-              --jq '.[].message' >> annotations.txt || true
-          done < job-ids.txt
+              --jq '.[].message' \
+            | while IFS= read -r line; do
+                printf '%s\t%s\n' "$name" "$line" >> annotations.tsv
+              done
+          done < jobs.tsv
           echo "--- annotations ---"
-          cat annotations.txt
-          if [ ! -s annotations.txt ]; then
+          cat annotations.tsv
+          if [ ! -s annotations.tsv ]; then
             echo "::error::no annotations collected; the assertions would be vacuous"
             exit 1
           fi
@@ -123,15 +201,26 @@ jobs:
           set -uo pipefail
           failed=0
 
-          if grep -qF -- "riseproject-dev/python-versions/main/versions-manifest.json" annotations.txt; then
+          if grep -qF -- "riseproject-dev/python-versions/main/versions-manifest.json" annotations.tsv; then
             echo "ok: not-found message names the riscv64 mirror manifest"
           else
             echo "::error::not-found message did not name the riscv64 mirror manifest"
             failed=1
           fi
 
-          if grep -qF -- "riscv64" annotations.txt; then
-            echo "ok: riscv64 referenced in the failure output"
-          fi
+          # The arch-override jobs must NOT report "was not found": forcing
+          # riscv64 makes the manifest lookup succeed, so a not-found error
+          # there would mean the arch never reached the manifest query.
+          for job in \
+            "riscv64 arch override reaches the download" \
+            "riscv64 freethreaded arch override reaches the download"
+          do
+            if awk -F'\t' -v j="$job" '$1 == j && index($2, "was not found") { f = 1 } END { exit f ? 0 : 1 }' annotations.tsv; then
+              echo "::error::'$job' still reported 'was not found', so resolution never matched riscv64"
+              failed=1
+            else
+              echo "ok: '$job' got past manifest resolution"
+            fi
+          done
 
           exit "$failed"
