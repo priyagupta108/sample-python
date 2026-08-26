@@ -56,9 +56,9 @@ jobs:
           # the tool cache. Pairing it with an uncached version instead would
           # prove nothing, since the manifest would be fetched either way.
           - name: check-latest
-            version: '3.14'
+            version: '3.15'
             latest: true
-            prerelease: false
+            prerelease: true
           # Old patch (latest 3.11 is 3.11.16), so never tool-cached.
           - name: patch
             version: '3.11.7'
