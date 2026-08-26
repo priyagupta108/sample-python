@@ -48,12 +48,15 @@ jobs:
           # and the cache cannot help. allow-prereleases is required or `3.15`
           # matches no stable release.
           - name: non cache
-            version: '3.11.7'
+            version: '3.15'
             latest: false
             prerelease: true
-          # Resolves against the manifest before consulting the tool cache.
+          # Same version as `hosted cache version`, so the only variable is
+          # check-latest, which resolves against the manifest before consulting
+          # the tool cache. Pairing it with an uncached version instead would
+          # prove nothing, since the manifest would be fetched either way.
           - name: check-latest
-            version: '3.15'
+            version: '3.14'
             latest: true
             prerelease: false
           # Old patch (latest 3.11 is 3.11.16), so never tool-cached.
