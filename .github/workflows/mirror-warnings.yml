@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up PyPy with a mirror set
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: 'pypy3.10'
           mirror: ${{ env.FORK_MIRROR }}
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up GraalPy with a mirror set
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: 'graalpy-24.0'
           mirror: ${{ env.FORK_MIRROR }}
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up PyPy without a mirror
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: 'pypy3.10'
          
@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up GraalPy without a mirror
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: 'graalpy-24.0'
          
@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Python via refs/heads form
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: '3.11.7'
           mirror: 'https://raw.githubusercontent.com/priyagupta108/python-versions/refs/heads/main'

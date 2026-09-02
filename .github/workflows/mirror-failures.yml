@@ -52,7 +52,7 @@ jobs:
         # Load-bearing: this step is expected to fail, and without this the job
         # aborts here and the assertion below never runs.
         continue-on-error: true
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: ${{ matrix.case.version }}
           mirror: ${{ matrix.case.mirror }}
@@ -94,7 +94,7 @@ jobs:
         id: setup
         # Load-bearing, as above.
         continue-on-error: true
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: '3.9.13'
           mirror: 'https://raw.githubusercontent.com/priyagupta108/python-versions/main'

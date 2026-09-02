@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Set up Python
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: ${{ env.PY_VERSION }}
           mirror: ${{ matrix.case.mirror }}
@@ -81,7 +81,7 @@ jobs:
 
     steps:
       - name: Set up Python without a mirror input
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: ${{ env.PY_VERSION }}
 

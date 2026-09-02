@@ -73,7 +73,7 @@ jobs:
           ls -1 "$RUNNER_TOOL_CACHE/Python" 2>/dev/null || echo "(no Python tool cache directory)"
 
       - name: Set up Python
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: ${{ matrix.case.version }}
           mirror: ${{ matrix.mirror.url }}

@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: Set up Python from fork
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: ${{ env.PY_VERSION }}
           mirror: ${{ env.FORK_MIRROR }}
@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: Set up Python from fork without a token
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: ${{ env.PY_VERSION }}
           mirror: ${{ env.FORK_MIRROR }}
@@ -78,7 +78,7 @@ jobs:
 
     steps:
       - name: Set up Python from fork with mirror-token
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: ${{ env.PY_VERSION }}
           mirror: ${{ env.FORK_MIRROR }}
@@ -108,7 +108,7 @@ jobs:
         id: setup
         # Load-bearing: the failure is the expected result.
         continue-on-error: true
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: ${{ env.PY_VERSION }}
           mirror: ${{ env.FORK_MIRROR }}

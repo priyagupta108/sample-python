@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Set up Python from the riscv64 mirror
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: ${{ env.PY_VERSION }}
           architecture: 'riscv64'
@@ -44,7 +44,7 @@ jobs:
 
     steps:
       - name: Set up free-threaded Python from the riscv64 mirror
-        uses: riseproject-dev/setup-python@0d1135ac814405808323d2060134097ba5fd641b
+        uses: riseproject-dev/setup-python@main
         with:
           python-version: ${{ env.FT_VERSION }}
           architecture: 'riscv64'
